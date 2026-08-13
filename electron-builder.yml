@@ -1,0 +1,16 @@
+appId: com.codenav.admin
+productName: CodeNav 管理
+directories:
+  output: release
+win:
+  target: nsis
+  icon: resources/icon.png
+mac:
+  target: dmg
+  icon: resources/icon.png
+linux:
+  target: deb
+  icon: resources/icon.png
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
