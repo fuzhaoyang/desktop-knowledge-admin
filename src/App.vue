@@ -1,21 +1,26 @@
 <template>
   <div class="app">
     <TitleBar />
-    <nav class="app-nav">
-      <button :class="{ active: tab === 'knowledge' }" @click="tab = 'knowledge'">📚 {{ $t('knowledgeMgr') }}</button>
-      <button :class="{ active: tab === 'admin' }" @click="tab = 'admin'">👤 {{ $t('chat.adminTitle') }}</button>
-    </nav>
-    <main class="app-main">
-      <KnowledgeView v-if="tab === 'knowledge'" />
-      <AdminChatView v-if="tab === 'admin'" />
-    </main>
+    <LoginView v-if="!isLoggedIn" />
+    <template v-else>
+      <nav class="app-nav">
+        <button :class="{ active: tab === 'knowledge' }" @click="tab = 'knowledge'">📚 {{ $t('knowledgeMgr') }}</button>
+        <button :class="{ active: tab === 'admin' }" @click="tab = 'admin'">👤 {{ $t('chat.adminTitle') }}</button>
+      </nav>
+      <main class="app-main">
+        <KnowledgeView v-if="tab === 'knowledge'" />
+        <AdminChatView v-if="tab === 'admin'" />
+      </main>
+    </template>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { isLoggedIn } from './auth'
 import KnowledgeView from './views/KnowledgeView.vue'
 import AdminChatView from './views/AdminChatView.vue'
+import LoginView from './views/LoginView.vue'
 import TitleBar from './components/TitleBar.vue'
 
 const tab = ref('knowledge')
