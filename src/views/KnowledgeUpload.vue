@@ -8,12 +8,12 @@
           <p>{{ $t('knowledgeUploadDesc') }}</p>
 
           <div class="tabs">
-            <span :class="['tab', { active: activeTab === 'file' }]" @click="activeTab = 'file'">{{ $t('knowledgeManageFileCount') }}</span>
-            <span :class="['tab', { active: activeTab === 'text' }]" @click="activeTab = 'text'">{{ $t('knowledgeManageTextCount') }}</span>
-            <span :class="['tab', { active: activeTab === 'url' }]" @click="activeTab = 'url'">URL爬取</span>
-            <span :class="['tab', { active: activeTab === 'stats' }]" @click="activeTab = 'stats'">{{ $t('knowledgeManageStats') }}</span>
-            <span :class="['tab', { active: activeTab === 'failures' }]" @click="activeTab = 'failures'">同步失败</span>
-            <span :class="['tab', { active: activeTab === 'files' }]" @click="activeTab = 'files'">文件目录</span>
+            <span :class="['tab', { active: activeTab === 'file' }]" @click="activeTab = 'file'"><UploadOutlined /> {{ $t('knowledgeManageFileCount') }}</span>
+            <span :class="['tab', { active: activeTab === 'text' }]" @click="activeTab = 'text'"><EditOutlined /> {{ $t('knowledgeManageTextCount') }}</span>
+            <span :class="['tab', { active: activeTab === 'url' }]" @click="activeTab = 'url'"><LinkOutlined /> URL爬取</span>
+            <span :class="['tab', { active: activeTab === 'stats' }]" @click="activeTab = 'stats'"><BookOutlined /> {{ $t('knowledgeManageStats') }}</span>
+            <span :class="['tab', { active: activeTab === 'failures' }]" @click="activeTab = 'failures'"><InfoCircleOutlined /> 同步失败</span>
+            <span :class="['tab', { active: activeTab === 'files' }]" @click="activeTab = 'files'"><FileOutlined /> 文件目录</span>
           </div>
 
           <div v-if="activeTab === 'file'">
@@ -875,8 +875,12 @@ export default defineComponent({
   color: #666;
   border-bottom: 2px solid transparent;
   margin-bottom: -2px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   transition: color 0.2s, border-color 0.2s;
 }
+.tab :deep(.anticon) { font-size: 15px; }
 .tab:hover {
   color: #1677ff;
 }

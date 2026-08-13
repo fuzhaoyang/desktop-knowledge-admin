@@ -29,6 +29,11 @@ const tab = ref('knowledge')
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: #f5f7fd; }
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #c8d0dc; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--tag-bg, #1677ff); }
+::-webkit-scrollbar-corner { background: transparent; }
 .app { display: flex; flex-direction: column; height: 100vh; }
 .app-nav {
   display: flex; gap: 4px; padding: 8px 12px;
