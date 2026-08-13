@@ -3,14 +3,16 @@
     <TitleBar />
     <LoginView v-if="!isLoggedIn" />
     <template v-else>
-      <nav class="app-nav">
-        <button :class="{ active: tab === 'knowledge' }" @click="tab = 'knowledge'">📚 {{ $t('knowledgeMgr') }}</button>
-        <button :class="{ active: tab === 'admin' }" @click="tab = 'admin'">👤 {{ $t('chat.adminTitle') }}</button>
-      </nav>
-      <main class="app-main">
-        <KnowledgeView v-if="tab === 'knowledge'" />
-        <AdminChatView v-if="tab === 'admin'" />
-      </main>
+      <div class="app-body">
+        <aside class="app-sidebar">
+          <button :class="{ active: tab === 'knowledge' }" @click="tab = 'knowledge'">📚 {{ $t('knowledgeMgr') }}</button>
+          <button :class="{ active: tab === 'admin' }" @click="tab = 'admin'">👤 {{ $t('chat.adminTitle') }}</button>
+        </aside>
+        <main class="app-main">
+          <KnowledgeView v-if="tab === 'knowledge'" />
+          <AdminChatView v-if="tab === 'admin'" />
+        </main>
+      </div>
     </template>
   </div>
 </template>
@@ -35,19 +37,36 @@ body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: #
 ::-webkit-scrollbar-thumb:hover { background: var(--tag-bg, #1677ff); }
 ::-webkit-scrollbar-corner { background: transparent; }
 .app { display: flex; flex-direction: column; height: 100vh; }
-.app-nav {
-  display: flex; gap: 4px; padding: 8px 12px;
-  background: linear-gradient(135deg, var(--tag-bg, #1677ff), #1677ff 90%, #095ed9);
+.app-body { flex: 1; display: flex; overflow: hidden; }
+.app-sidebar {
+  width: 180px;
   flex-shrink: 0;
-  -webkit-app-region: no-drag;
+  background: #fff;
+  border-right: 1px solid #f0f0f0;
+  padding: 12px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
-.app-nav button {
-  -webkit-app-region: no-drag;
-  padding: 6px 16px; border: none; border-radius: 6px;
-  background: rgba(255,255,255,0.15); color: #fff; cursor: pointer;
-  font-size: 13px; transition: background 0.2s;
+.app-sidebar button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border: none;
+  background: transparent;
+  color: #606266;
+  font-size: 14px;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
 }
-.app-nav button.active { background: rgba(255,255,255,0.35); font-weight: 600; }
-.app-nav button:hover { background: rgba(255,255,255,0.25); }
+.app-sidebar button:hover { background: #f5f7fd; color: #1677ff; }
+.app-sidebar button.active {
+  background: rgba(22,119,255,0.08);
+  color: #1677ff;
+  font-weight: 600;
+  box-shadow: inset 3px 0 0 var(--tag-bg, #1677ff);
+}
 .app-main { flex: 1; overflow: hidden; }
 </style>
