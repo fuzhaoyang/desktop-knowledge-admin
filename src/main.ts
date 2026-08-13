@@ -1,7 +1,10 @@
 import { createApp } from 'vue'
+import Antd from 'ant-design-vue'
+import 'ant-design-vue/dist/antd.css'
 import App from './App.vue'
 import i18n from './language'
 
 const app = createApp(App)
+app.use(Antd)
 app.use(i18n)
 app.mount('#app')
