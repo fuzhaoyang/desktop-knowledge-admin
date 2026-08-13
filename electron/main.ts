@@ -1,8 +1,27 @@
-import { app, BrowserWindow, Tray, Menu, nativeImage, Notification, ipcMain } from 'electron'
+import { app, BrowserWindow, Tray, Menu, nativeImage, Notification, ipcMain, session } from 'electron'
 import { join } from 'path'
 
 let mainWin: BrowserWindow | null = null
 let tray: Tray | null = null
+
+const API_ORIGIN = 'https://code-nav.top'
+
+function bypassCors() {
+  const ses = session.defaultSession
+  ses.webRequest.onBeforeSendHeaders({ urls: [API_ORIGIN + '/*', 'wss://code-nav.top/*'] }, (details, cb) => {
+    if (details.requestHeaders.origin != null || details.requestHeaders.Origin != null) {
+      details.requestHeaders.Origin = API_ORIGIN
+    }
+    cb({ requestHeaders: details.requestHeaders })
+  })
+  ses.webRequest.onHeadersReceived({ urls: [API_ORIGIN + '/*', 'wss://code-nav.top/*'] }, (details, cb) => {
+    const h = details.responseHeaders || {}
+    h['access-control-allow-origin'] = ['*']
+    h['access-control-allow-headers'] = ['*']
+    h['access-control-allow-methods'] = ['GET, POST, PUT, DELETE, OPTIONS']
+    cb({ responseHeaders: h })
+  })
+}
 
 function registerIpc() {
   ipcMain.handle('win:minimize', () => mainWin?.minimize())
@@ -63,6 +82,7 @@ function createTray() {
 }
 
 app.whenReady().then(() => {
+  bypassCors()
   registerIpc()
   createWindow()
   createTray()
