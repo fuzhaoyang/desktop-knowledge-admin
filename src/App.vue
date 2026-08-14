@@ -5,16 +5,26 @@
     <template v-else>
       <div class="app-body">
         <aside class="app-sidebar">
-          <button :class="{ active: tab === 'knowledge' }" @click="tab = 'knowledge'">📚 {{ $t('knowledgeMgr') }}</button>
-          <div v-if="tab === 'knowledge'" class="app-submenu">
-            <button :class="{ active: knowledgeTab === 'file' }" @click="knowledgeTab = 'file'"><UploadOutlined /> 文件</button>
-            <button :class="{ active: knowledgeTab === 'text' }" @click="knowledgeTab = 'text'"><EditOutlined /> 文本</button>
-            <button :class="{ active: knowledgeTab === 'url' }" @click="knowledgeTab = 'url'"><LinkOutlined /> URL爬取</button>
-            <button :class="{ active: knowledgeTab === 'stats' }" @click="knowledgeTab = 'stats'"><BookOutlined /> 统计</button>
-            <button :class="{ active: knowledgeTab === 'failures' }" @click="knowledgeTab = 'failures'"><InfoCircleOutlined /> 同步失败</button>
-            <button :class="{ active: knowledgeTab === 'files' }" @click="knowledgeTab = 'files'"><FileOutlined /> 文件目录</button>
-          </div>
-          <button :class="{ active: tab === 'admin' }" @click="tab = 'admin'">👤 {{ $t('chat.adminTitle') }}</button>
+          <a-menu
+            v-model:selectedKeys="selectedKeys"
+            mode="inline"
+            theme="light"
+            class="sidebar-menu"
+            @click="onMenuClick"
+          >
+            <a-sub-menu key="knowledge">
+              <template #title>
+                <span><AppstoreOutlined /> {{ $t('knowledgeMgr') }}</span>
+              </template>
+              <a-menu-item key="file"><UploadOutlined /> 文件</a-menu-item>
+              <a-menu-item key="text"><EditOutlined /> 文本</a-menu-item>
+              <a-menu-item key="url"><LinkOutlined /> URL爬取</a-menu-item>
+              <a-menu-item key="stats"><BookOutlined /> 统计</a-menu-item>
+              <a-menu-item key="failures"><InfoCircleOutlined /> 同步失败</a-menu-item>
+              <a-menu-item key="files"><FileOutlined /> 文件目录</a-menu-item>
+            </a-sub-menu>
+            <a-menu-item key="admin"><UserOutlined /> {{ $t('chat.adminTitle') }}</a-menu-item>
+          </a-menu>
         </aside>
         <main class="app-main">
           <KnowledgeView v-if="tab === 'knowledge'" :active-tab="knowledgeTab" />
@@ -28,14 +38,28 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { isLoggedIn } from './auth'
-import { UploadOutlined, EditOutlined, LinkOutlined, BookOutlined, InfoCircleOutlined, FileOutlined } from '@ant-design/icons-vue'
+import { UploadOutlined, EditOutlined, LinkOutlined, BookOutlined, InfoCircleOutlined, FileOutlined, AppstoreOutlined, UserOutlined } from '@ant-design/icons-vue'
 import KnowledgeView from './views/KnowledgeView.vue'
 import AdminChatView from './views/AdminChatView.vue'
 import LoginView from './views/LoginView.vue'
 import TitleBar from './components/TitleBar.vue'
 
-const tab = ref('knowledge')
+type MenuItem = { key: string; keyPath: string[] }
+const subKeys = ['file', 'text', 'url', 'stats', 'failures', 'files']
+const selectedKeys = ref<string[]>(['file'])
+const tab = ref<'knowledge' | 'admin'>('knowledge')
 const knowledgeTab = ref('file')
+
+function onMenuClick({ key, keyPath }: MenuItem) {
+  if (key === 'admin') {
+    tab.value = 'admin'
+    return
+  }
+  if (subKeys.includes(key)) {
+    knowledgeTab.value = key
+    tab.value = 'knowledge'
+  }
+}
 </script>
 
 <style>
@@ -53,53 +77,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: #
   flex-shrink: 0;
   background: #fff;
   border-right: 1px solid #f0f0f0;
-  padding: 12px 0;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+  overflow-y: auto;
 }
-.app-sidebar button {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 20px;
-  border: none;
-  background: transparent;
-  color: #606266;
-  font-size: 14px;
-  text-align: left;
-  cursor: pointer;
-  transition: background 0.2s, color 0.2s;
-}
-.app-sidebar button:hover { background: #f5f7fd; color: #1677ff; }
-.app-sidebar button.active {
-  background: rgba(22,119,255,0.08);
-  color: #1677ff;
-  font-weight: 600;
-  box-shadow: inset 3px 0 0 var(--tag-bg, #1677ff);
-}
-.app-submenu {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  padding: 4px 0 8px;
-  border-bottom: 1px solid #f0f0f0;
-  margin-bottom: 4px;
-}
-.app-submenu button {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 20px 8px 36px;
-  border: none;
-  background: transparent;
-  color: #909399;
-  font-size: 13px;
-  text-align: left;
-  cursor: pointer;
-  transition: background 0.2s, color 0.2s;
-}
-.app-submenu button:hover { background: #f5f7fd; color: #1677ff; }
-.app-submenu button.active { color: #1677ff; font-weight: 600; background: rgba(22,119,255,0.06); }
+.sidebar-menu { border-inline-end: none !important; }
 .app-main { flex: 1; overflow: hidden; }
 </style>
