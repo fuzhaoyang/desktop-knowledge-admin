@@ -117,13 +117,6 @@
                 批量删除 ({{ selectedRowKeys.length }})
               </a-button>
               <a-button danger @click="showClearAllModal" style="margin-left: 8px">一键清除所有文章</a-button>
-              <a-select
-                :value="currentModel"
-                style="width: 260px; margin-left: 8px"
-                @change="showModelSwitchModal"
-              >
-                <a-select-option v-for="m in availableModels" :key="m" :value="m">{{ m }}</a-select-option>
-              </a-select>
             </div>
 
             <a-table
@@ -179,11 +172,6 @@
             <a-modal v-model:visible="clearAllModalVisible" title="一键清除所有文章" @ok="confirmClearAll" :confirmLoading="clearAllLoading">
               <p>确定要清除所有文章吗？此操作将删除所有向量数据和条目记录，不可撤销。</p>
               <a-input-password v-model:value="clearAllSecretKey" placeholder="请输入验证码" @keydown.enter="confirmClearAll" />
-            </a-modal>
-
-            <a-modal v-model:visible="modelSwitchModalVisible" title="切换模型" @ok="confirmSwitchModel" :confirmLoading="modelSwitchLoading">
-              <p>确定切换到 {{ pendingModel }} ？</p>
-              <a-input-password v-model:value="modelSwitchSecretKey" placeholder="请输入验证码" @keydown.enter="confirmSwitchModel" />
             </a-modal>
           </div>
 
@@ -388,17 +376,10 @@ export default defineComponent({
     const clearAllModalVisible = ref(false);
     const clearAllSecretKey = ref('');
     const clearAllLoading = ref(false);
-    const currentModel = ref('');
-    const availableModels = ref<string[]>([]);
-    const pendingModel = ref('');
-    const modelSwitchModalVisible = ref(false);
-    const modelSwitchSecretKey = ref('');
-    const modelSwitchLoading = ref(false);
 
     onMounted(() => {
       loadStats();
       loadEntries();
-      loadModel();
     });
 
     watch(() => props.activeTab, (tab) => {
@@ -655,48 +636,6 @@ export default defineComponent({
       }
     }
 
-    async function loadModel() {
-      try {
-        const res = await fetch(API_BASE + '/api/model');
-        const data = await res.json();
-        currentModel.value = data.model;
-        availableModels.value = data.available;
-      } catch {
-        // ignore
-      }
-    }
-
-    function showModelSwitchModal(value: string) {
-      pendingModel.value = value;
-      modelSwitchSecretKey.value = '';
-      modelSwitchModalVisible.value = true;
-    }
-
-    async function confirmSwitchModel() {
-      if (!modelSwitchSecretKey.value) return;
-      modelSwitchLoading.value = true;
-      try {
-        const formData = new FormData();
-        formData.append('model', pendingModel.value);
-        formData.append('secret_key', modelSwitchSecretKey.value);
-        const res = await fetch(API_BASE + '/api/model', { method: 'POST', body: formData });
-        if (res.ok) {
-          const data = await res.json();
-          currentModel.value = data.model;
-          modelSwitchModalVisible.value = false;
-          modelSwitchSecretKey.value = '';
-          message.success(`已切换到 ${data.model}`);
-        } else {
-          const data = await res.json();
-          message.error(data.detail || '切换失败');
-        }
-      } catch {
-        message.error('切换失败：网络错误');
-      } finally {
-        modelSwitchLoading.value = false;
-      }
-    }
-
     async function retryFile(record: { filename: string }) {
       try {
         const res = await fetch(API_BASE + '/api/file-update/retry?filename=' + encodeURIComponent(record.filename), {
@@ -812,7 +751,7 @@ export default defineComponent({
       if (file) uploadFile(file);
     }
 
-    return { activeTab: computed(() => props.activeTab), fileInput, uploading, verifying, result, secretKey, uploadedFileId, uploadedFileName, triggerUpload, onFileSelected, onDrop, submitVerify, textContent, textSecretKey, textSubmitting, submitText, crawlUrl, crawlSecretKey, crawlSubmitting, crawlMode, submitCrawl, menuCrawlUrl, menuCrawlSecretKey, menuCrawlSubmitting, menuCrawlResult, submitMenuCrawl, stats, entries, loading, searchText, pagination, columns, loadEntries, handleTableChange, handleExpand, deleteEntry, showDeleteModal, showBatchDeleteModal, confirmDelete, deleteModalVisible, deleteSecretKey, deleteLoading, selectedRowKeys, onSelectChange, isBatchDelete, failures, failuresLoading, failureColumns, loadFailures, fileList, fileListLoading, fileColumns, loadFileList, formatSize, showFileDeleteModal, confirmFileDelete, fileDeleteModalVisible, fileDeleteSecretKey, fileDeleteLoading, deletingFile, retryFile, showClearAllModal, confirmClearAll, clearAllModalVisible, clearAllSecretKey, clearAllLoading, currentModel, availableModels, pendingModel, modelSwitchModalVisible, modelSwitchSecretKey, modelSwitchLoading, showModelSwitchModal, confirmSwitchModel };
+    return { activeTab: computed(() => props.activeTab), fileInput, uploading, verifying, result, secretKey, uploadedFileId, uploadedFileName, triggerUpload, onFileSelected, onDrop, submitVerify, textContent, textSecretKey, textSubmitting, submitText, crawlUrl, crawlSecretKey, crawlSubmitting, crawlMode, submitCrawl, menuCrawlUrl, menuCrawlSecretKey, menuCrawlSubmitting, menuCrawlResult, submitMenuCrawl, stats, entries, loading, searchText, pagination, columns, loadEntries, handleTableChange, handleExpand, deleteEntry, showDeleteModal, showBatchDeleteModal, confirmDelete, deleteModalVisible, deleteSecretKey, deleteLoading, selectedRowKeys, onSelectChange, isBatchDelete, failures, failuresLoading, failureColumns, loadFailures, fileList, fileListLoading, fileColumns, loadFileList, formatSize, showFileDeleteModal, confirmFileDelete, fileDeleteModalVisible, fileDeleteSecretKey, fileDeleteLoading, deletingFile, retryFile, showClearAllModal, confirmClearAll, clearAllModalVisible, clearAllSecretKey, clearAllLoading };
   }
 });
 </script>
