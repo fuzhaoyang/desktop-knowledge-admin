@@ -15,17 +15,37 @@
             @click="onMenuClick"
           >
             <a-sub-menu key="knowledge">
-              <template #title>
-                <span><AppstoreOutlined /> {{ $t('knowledgeMgr') }}</span>
-              </template>
-              <a-menu-item key="file"><UploadOutlined /> <span>文件</span></a-menu-item>
-              <a-menu-item key="text"><EditOutlined /> <span>文本</span></a-menu-item>
-              <a-menu-item key="url"><LinkOutlined /> <span>URL爬取</span></a-menu-item>
-              <a-menu-item key="stats"><BookOutlined /> <span>统计</span></a-menu-item>
-              <a-menu-item key="failures"><InfoCircleOutlined /> <span>同步失败</span></a-menu-item>
-              <a-menu-item key="files"><FileOutlined /> <span>文件目录</span></a-menu-item>
+              <template #icon><AppstoreOutlined /></template>
+              <template #title>{{ $t('knowledgeMgr') }}</template>
+              <a-menu-item key="file">
+                <template #icon><UploadOutlined /></template>
+                文件
+              </a-menu-item>
+              <a-menu-item key="text">
+                <template #icon><EditOutlined /></template>
+                文本
+              </a-menu-item>
+              <a-menu-item key="url">
+                <template #icon><LinkOutlined /></template>
+                URL爬取
+              </a-menu-item>
+              <a-menu-item key="stats">
+                <template #icon><BookOutlined /></template>
+                统计
+              </a-menu-item>
+              <a-menu-item key="failures">
+                <template #icon><InfoCircleOutlined /></template>
+                同步失败
+              </a-menu-item>
+              <a-menu-item key="files">
+                <template #icon><FileOutlined /></template>
+                文件目录
+              </a-menu-item>
             </a-sub-menu>
-            <a-menu-item key="admin"><UserOutlined /> <span>{{ $t('chat.adminTitle') }}</span></a-menu-item>
+            <a-menu-item key="admin">
+              <template #icon><UserOutlined /></template>
+              {{ $t('chat.adminTitle') }}
+            </a-menu-item>
           </a-menu>
         </aside>
         <main class="app-main">
@@ -95,13 +115,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: #
   transition: width 0.2s ease;
 }
 .app-sidebar.collapsed { width: 64px; }
-.app-sidebar.collapsed .ant-menu-item,
-.app-sidebar.collapsed .ant-menu-submenu-title {
-  padding-inline: 0 !important;
-  justify-content: center;
-}
-.app-sidebar.collapsed .ant-menu-item span:not(.anticon),
-.app-sidebar.collapsed .ant-menu-submenu-title span:not(.anticon) { display: none !important; }
 .sidebar-menu { border-inline-end: none !important; }
 .app-main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
 .content-toolbar {
