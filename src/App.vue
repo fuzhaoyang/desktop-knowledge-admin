@@ -94,6 +94,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: #
   transition: width 0.2s ease;
 }
 .app-sidebar.collapsed { width: 64px; }
+.app-sidebar.collapsed .ant-menu-item,
+.app-sidebar.collapsed .ant-menu-submenu-title { padding-inline: 0 !important; }
+.app-sidebar.collapsed .ant-menu-item span,
+.app-sidebar.collapsed .ant-menu-submenu-title span { display: none !important; }
 .sidebar-menu { border-inline-end: none !important; }
 .app-main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
 .content-toolbar {
