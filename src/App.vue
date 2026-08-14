@@ -58,7 +58,7 @@
             <a-select
               v-if="tab === 'knowledge' && isLoggedIn"
               :value="currentModel"
-              style="width: 200px; margin-right: 100px"
+              style="width: 200px; margin-right: 50px"
               @change="showModelSwitchModal"
             >
               <a-select-option v-for="m in availableModels" :key="m" :value="m">{{ m }}</a-select-option>
