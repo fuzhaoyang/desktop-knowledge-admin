@@ -1,5 +1,6 @@
 <template>
   <div class="login-page" ref="pageRef" @mousemove="onMouseMove">
+    <canvas ref="canvasRef" class="particle-canvas" />
     <div class="bg-blob blob-1" :style="parallaxStyle(0)" />
     <div class="bg-blob blob-2" :style="parallaxStyle(1)" />
     <div class="bg-blob blob-3" :style="parallaxStyle(2)" />
@@ -33,7 +34,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted, onBeforeUnmount } from 'vue'
 import { login } from '../auth'
 
 const username = ref('')
@@ -43,10 +44,10 @@ const submitting = ref(false)
 const error = ref('')
 const leaving = ref(false)
 const pageRef = ref<HTMLElement | null>(null)
+const canvasRef = ref<HTMLCanvasElement | null>(null)
 
 const mouse = { x: 0, y: 0 }
 const parallax = ref({ x: 0, y: 0 })
-
 const factors = [20, 14, 28]
 
 function parallaxStyle(i: number) {
@@ -76,6 +77,93 @@ function onSubmit() {
     submitting.value = false
   }
 }
+
+interface Particle { x: number; y: number; vx: number; vy: number; r: number }
+let raf = 0
+let particles: Particle[] = []
+
+function initParticles() {
+  const canvas = canvasRef.value
+  if (!canvas) return
+  const ctx = canvas.getContext('2d')
+  if (!ctx) return
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  if (reduce) return
+
+  const parent = canvas.parentElement!
+  const dpr = window.devicePixelRatio || 1
+  const resize = () => {
+    const w = parent.clientWidth
+    const h = parent.clientHeight
+    canvas.width = w * dpr
+    canvas.height = h * dpr
+    canvas.style.width = w + 'px'
+    canvas.style.height = h + 'px'
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+  }
+  resize()
+
+  const count = 60
+  particles = Array.from({ length: count }, () => ({
+    x: Math.random() * parent.clientWidth,
+    y: Math.random() * parent.clientHeight,
+    vx: (Math.random() - 0.5) * 0.4,
+    vy: (Math.random() - 0.5) * 0.4,
+    r: Math.random() * 1.5 + 0.5,
+  }))
+
+  const maxDist = 120
+  const tick = () => {
+    const w = parent.clientWidth
+    const h = parent.clientHeight
+    ctx.clearRect(0, 0, w, h)
+
+    for (const p of particles) {
+      p.x += p.vx
+      p.y += p.vy
+      if (p.x < 0) p.x = w
+      else if (p.x > w) p.x = 0
+      if (p.y < 0) p.y = h
+      else if (p.y > h) p.y = 0
+      ctx.beginPath()
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2)
+      ctx.fillStyle = 'rgba(22,119,255,0.55)'
+      ctx.fill()
+    }
+
+    for (let i = 0; i < particles.length; i++) {
+      for (let j = i + 1; j < particles.length; j++) {
+        const dx = particles[i].x - particles[j].x
+        const dy = particles[i].y - particles[j].y
+        const dist = Math.sqrt(dx * dx + dy * dy)
+        if (dist < maxDist) {
+          ctx.beginPath()
+          ctx.moveTo(particles[i].x, particles[i].y)
+          ctx.lineTo(particles[j].x, particles[j].y)
+          ctx.strokeStyle = `rgba(22,119,255,${(1 - dist / maxDist) * 0.25})`
+          ctx.lineWidth = 1
+          ctx.stroke()
+        }
+      }
+    }
+    raf = requestAnimationFrame(tick)
+  }
+  tick()
+
+  const ro = new ResizeObserver(resize)
+  ro.observe(parent)
+  ;(canvas as any)._ro = ro
+}
+
+onMounted(() => {
+  initParticles()
+})
+
+onBeforeUnmount(() => {
+  cancelAnimationFrame(raf)
+  const canvas = canvasRef.value
+  if (canvas) (canvas as any)._ro?.disconnect()
+})
 </script>
 
 <style scoped>
@@ -87,6 +175,12 @@ function onSubmit() {
   justify-content: center;
   overflow: hidden;
   background: #f5f7fd;
+}
+.particle-canvas {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
 }
 .bg-blob {
   position: absolute;
@@ -132,7 +226,7 @@ function onSubmit() {
 }
 .login-card {
   position: relative;
-  z-index: 1;
+  z-index: 2;
   width: 340px;
   padding: 40px;
   background: #fff;
