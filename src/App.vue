@@ -54,6 +54,10 @@
               <MenuFoldOutlined v-if="!collapsed" />
               <MenuUnfoldOutlined v-else />
             </button>
+            <div class="toolbar-spacer" />
+            <button v-if="isLoggedIn" class="collapse-trigger" title="退出登录" @click="onLogout">
+              <LogoutOutlined />
+            </button>
           </div>
           <div class="content-wrap">
             <KnowledgeView v-if="tab === 'knowledge'" :active-tab="knowledgeTab" />
@@ -67,8 +71,8 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { isLoggedIn } from './auth'
-import { UploadOutlined, EditOutlined, LinkOutlined, BookOutlined, InfoCircleOutlined, FileOutlined, AppstoreOutlined, UserOutlined, MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons-vue'
+import { isLoggedIn, logout } from './auth'
+import { UploadOutlined, EditOutlined, LinkOutlined, BookOutlined, InfoCircleOutlined, FileOutlined, AppstoreOutlined, UserOutlined, MenuFoldOutlined, MenuUnfoldOutlined, LogoutOutlined } from '@ant-design/icons-vue'
 import KnowledgeView from './views/KnowledgeView.vue'
 import AdminChatView from './views/AdminChatView.vue'
 import LoginView from './views/LoginView.vue'
@@ -93,6 +97,8 @@ function onMenuClick(info: { key: string; keyPath: string[] }) {
     tab.value = 'knowledge'
   }
 }
+
+function onLogout() { logout() }
 </script>
 
 <style>
@@ -139,5 +145,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: #
   transition: background 0.2s, color 0.2s;
 }
 .collapse-trigger:hover { background: #f5f7fd; color: #1677ff; }
+.toolbar-spacer { flex: 1; }
 .content-wrap { flex: 1; overflow: hidden; }
 </style>

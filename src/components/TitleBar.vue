@@ -2,13 +2,6 @@
   <div class="titlebar">
     <div class="titlebar-drag" />
     <div class="titlebar-controls">
-      <button v-if="isLoggedIn" class="tb-btn tb-logout" title="退出登录" @click="onLogout">
-        <svg viewBox="0 0 14 14" width="14" height="14">
-          <path d="M7 1 V8" stroke="currentColor" stroke-width="1.2" />
-          <path d="M4 5 L7 8 L10 5" stroke="currentColor" stroke-width="1.2" fill="none" stroke-linecap="round" stroke-linejoin="round" />
-          <path d="M2 9 V12 H12 V9" stroke="currentColor" stroke-width="1.2" fill="none" stroke-linecap="round" />
-        </svg>
-      </button>
       <button class="tb-btn" title="全屏" @click="onFullscreen">
         <svg viewBox="0 0 10 10" width="10" height="10">
           <path d="M0 0 H4 M0 0 V4 M0 0 L3 3" stroke="currentColor" stroke-width="1" fill="none" />
@@ -38,7 +31,6 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount } from 'vue'
-import { isLoggedIn, logout } from '../auth'
 
 const isMaximized = ref(false)
 let off: (() => void) | null = null
@@ -55,7 +47,6 @@ function onMin() { window.electronAPI?.window?.minimize() }
 function onMaxToggle() { window.electronAPI?.window?.maximizeToggle() }
 function onFullscreen() { window.electronAPI?.window?.fullscreenToggle() }
 function onClose() { window.electronAPI?.window?.close() }
-function onLogout() { logout() }
 </script>
 
 <style scoped>
@@ -75,6 +66,5 @@ function onLogout() { logout() }
   cursor: pointer; transition: background 0.15s, color 0.15s;
 }
 .tb-btn:hover { background: var(--tag-bg, #1677ff); color: #fff; }
-.tb-logout { margin-left: 8px; }
 .tb-close:hover { background: #e8494e; color: #fff; }
 </style>
