@@ -6,6 +6,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     minimize: () => ipcRenderer.invoke('win:minimize'),
     maximizeToggle: () => ipcRenderer.invoke('win:maximize-toggle'),
     close: () => ipcRenderer.invoke('win:close'),
+    fullscreenToggle: () => ipcRenderer.invoke('win:fullscreen-toggle'),
     onMaximizeChange: (cb: (isMaximized: boolean) => void) => {
       const listener = (_e: unknown, isMaximized: boolean) => cb(isMaximized)
       ipcRenderer.removeAllListeners('win:maximize-changed')

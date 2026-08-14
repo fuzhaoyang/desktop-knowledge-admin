@@ -9,6 +9,14 @@
           <path d="M2 9 V12 H12 V9" stroke="currentColor" stroke-width="1.2" fill="none" stroke-linecap="round" />
         </svg>
       </button>
+      <button class="tb-btn" title="全屏" @click="onFullscreen">
+        <svg viewBox="0 0 10 10" width="10" height="10">
+          <path d="M0 0 H4 M0 0 V4 M0 0 L3 3" stroke="currentColor" stroke-width="1" fill="none" />
+          <path d="M10 0 H6 M10 0 V4 M10 0 L7 3" stroke="currentColor" stroke-width="1" fill="none" />
+          <path d="M0 10 H4 M0 10 V6 M0 10 L3 7" stroke="currentColor" stroke-width="1" fill="none" />
+          <path d="M10 10 H6 M10 10 V6 M10 10 L7 7" stroke="currentColor" stroke-width="1" fill="none" />
+        </svg>
+      </button>
       <button class="tb-btn" title="最小化" @click="onMin">
         <svg viewBox="0 0 10 10" width="10" height="10"><path d="M0 5 H10" stroke="currentColor" stroke-width="1" /></svg>
       </button>
@@ -45,6 +53,7 @@ onBeforeUnmount(() => off?.())
 
 function onMin() { window.electronAPI?.window?.minimize() }
 function onMaxToggle() { window.electronAPI?.window?.maximizeToggle() }
+function onFullscreen() { window.electronAPI?.window?.fullscreenToggle() }
 function onClose() { window.electronAPI?.window?.close() }
 function onLogout() { logout() }
 </script>

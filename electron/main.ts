@@ -31,12 +31,16 @@ function registerIpc() {
   })
   ipcMain.handle('win:close', () => mainWin?.hide())
   ipcMain.handle('win:get-maximized', () => !!mainWin?.isMaximized())
+  ipcMain.handle('win:fullscreen-toggle', () => {
+    if (!mainWin) return
+    mainWin.setFullScreen(!mainWin.isFullScreen())
+  })
 }
 
 function createWindow() {
   mainWin = new BrowserWindow({
-    width: 900,
-    height: 700,
+    width: 1200,
+    height: 800,
     minWidth: 400,
     minHeight: 600,
     frame: false,
