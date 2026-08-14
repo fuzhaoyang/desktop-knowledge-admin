@@ -91,6 +91,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: #
   background: #fff;
   border-right: 1px solid #f0f0f0;
   overflow-y: auto;
+  overflow-x: hidden;
   transition: width 0.2s ease;
 }
 .app-sidebar.collapsed { width: 64px; }
