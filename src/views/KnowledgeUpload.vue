@@ -7,15 +7,6 @@
           <h2>{{ $t('knowledgeUpload') }}</h2>
           <p>{{ $t('knowledgeUploadDesc') }}</p>
 
-          <div class="tabs">
-            <span :class="['tab', { active: activeTab === 'file' }]" @click="activeTab = 'file'"><UploadOutlined /> {{ $t('knowledgeManageFileCount') }}</span>
-            <span :class="['tab', { active: activeTab === 'text' }]" @click="activeTab = 'text'"><EditOutlined /> {{ $t('knowledgeManageTextCount') }}</span>
-            <span :class="['tab', { active: activeTab === 'url' }]" @click="activeTab = 'url'"><LinkOutlined /> URL爬取</span>
-            <span :class="['tab', { active: activeTab === 'stats' }]" @click="activeTab = 'stats'"><BookOutlined /> {{ $t('knowledgeManageStats') }}</span>
-            <span :class="['tab', { active: activeTab === 'failures' }]" @click="activeTab = 'failures'"><InfoCircleOutlined /> 同步失败</span>
-            <span :class="['tab', { active: activeTab === 'files' }]" @click="activeTab = 'files'"><FileOutlined /> 文件目录</span>
-          </div>
-
           <div v-if="activeTab === 'file'">
             <div v-if="!uploadedFileId" class="upload-area" @dragover.prevent @drop.prevent="onDrop" @click="triggerUpload">
               <UploadOutlined class="upload-icon" />
@@ -332,8 +323,8 @@ const meta = {
 export default defineComponent({
   name: 'KnowledgeUpload',
   components: { UploadOutlined, InfoCircleOutlined, EditOutlined, BulbOutlined, CheckCircleOutlined, FileOutlined, BookOutlined, LinkOutlined },
-  setup() {
-    const activeTab = ref('file');
+  props: { activeTab: { type: String, required: true } },
+  setup(props) {
     const fileInput = ref<HTMLInputElement | null>(null);
     const uploading = ref(false);
     const verifying = ref(false);
@@ -410,7 +401,7 @@ export default defineComponent({
       loadModel();
     });
 
-    watch(activeTab, (tab) => {
+    watch(() => props.activeTab, (tab) => {
       if (tab === 'stats') {
         loadStats();
         loadEntries();
@@ -821,7 +812,7 @@ export default defineComponent({
       if (file) uploadFile(file);
     }
 
-    return { activeTab, fileInput, uploading, verifying, result, secretKey, uploadedFileId, uploadedFileName, triggerUpload, onFileSelected, onDrop, submitVerify, textContent, textSecretKey, textSubmitting, submitText, crawlUrl, crawlSecretKey, crawlSubmitting, crawlMode, submitCrawl, menuCrawlUrl, menuCrawlSecretKey, menuCrawlSubmitting, menuCrawlResult, submitMenuCrawl, stats, entries, loading, searchText, pagination, columns, loadEntries, handleTableChange, handleExpand, deleteEntry, showDeleteModal, showBatchDeleteModal, confirmDelete, deleteModalVisible, deleteSecretKey, deleteLoading, selectedRowKeys, onSelectChange, isBatchDelete, failures, failuresLoading, failureColumns, loadFailures, fileList, fileListLoading, fileColumns, loadFileList, formatSize, showFileDeleteModal, confirmFileDelete, fileDeleteModalVisible, fileDeleteSecretKey, fileDeleteLoading, deletingFile, retryFile, showClearAllModal, confirmClearAll, clearAllModalVisible, clearAllSecretKey, clearAllLoading, currentModel, availableModels, pendingModel, modelSwitchModalVisible, modelSwitchSecretKey, modelSwitchLoading, showModelSwitchModal, confirmSwitchModel };
+    return { activeTab: props.activeTab, fileInput, uploading, verifying, result, secretKey, uploadedFileId, uploadedFileName, triggerUpload, onFileSelected, onDrop, submitVerify, textContent, textSecretKey, textSubmitting, submitText, crawlUrl, crawlSecretKey, crawlSubmitting, crawlMode, submitCrawl, menuCrawlUrl, menuCrawlSecretKey, menuCrawlSubmitting, menuCrawlResult, submitMenuCrawl, stats, entries, loading, searchText, pagination, columns, loadEntries, handleTableChange, handleExpand, deleteEntry, showDeleteModal, showBatchDeleteModal, confirmDelete, deleteModalVisible, deleteSecretKey, deleteLoading, selectedRowKeys, onSelectChange, isBatchDelete, failures, failuresLoading, failureColumns, loadFailures, fileList, fileListLoading, fileColumns, loadFileList, formatSize, showFileDeleteModal, confirmFileDelete, fileDeleteModalVisible, fileDeleteSecretKey, fileDeleteLoading, deletingFile, retryFile, showClearAllModal, confirmClearAll, clearAllModalVisible, clearAllSecretKey, clearAllLoading, currentModel, availableModels, pendingModel, modelSwitchModalVisible, modelSwitchSecretKey, modelSwitchLoading, showModelSwitchModal, confirmSwitchModel };
   }
 });
 </script>
@@ -861,33 +852,6 @@ export default defineComponent({
     color: #606266;
     text-align: left;
   }
-}
-.tabs {
-  display: flex;
-  gap: 0;
-  margin-bottom: 20px;
-  border-bottom: 2px solid #e8e8e8;
-}
-.tab {
-  padding: 10px 24px;
-  cursor: pointer;
-  font-size: 15px;
-  color: #666;
-  border-bottom: 2px solid transparent;
-  margin-bottom: -2px;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  transition: color 0.2s, border-color 0.2s;
-}
-.tab :deep(.anticon) { font-size: 15px; }
-.tab:hover {
-  color: #1677ff;
-}
-.tab.active {
-  color: #1677ff;
-  border-bottom-color: #1677ff;
-  font-weight: 600;
 }
 .upload-area {
   border: 2px dashed #d9d9d9;
