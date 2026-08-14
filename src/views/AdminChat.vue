@@ -326,8 +326,8 @@ onUnmounted(() => {
 <style scoped>
 .admin-chat {
   display: flex;
-  height: 100vh;
-  background: #f0f2f5;
+  height: 100%;
+  background: #f5f7fd;
   overflow: hidden;
 }
 .sidebar {
@@ -343,30 +343,32 @@ onUnmounted(() => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px;
+  padding: 14px 16px;
   border-bottom: 1px solid #f0f0f0;
-  background: linear-gradient(135deg, #1677ff, #096dd9);
-  color: #fff;
+  background: #fff;
+  color: #303133;
 }
 .sidebar-header h3 {
   margin: 0;
-  font-size: 16px;
-  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  color: #303133;
 }
 .refresh-btn {
-  background: rgba(255,255,255,0.2);
+  background: transparent;
   border: none;
   border-radius: 6px;
   padding: 6px 8px;
   font-size: 14px;
-  color: #fff;
+  color: #909399;
   cursor: pointer;
   display: flex;
   align-items: center;
-  transition: background 0.2s;
+  transition: background 0.2s, color 0.2s;
 }
 .refresh-btn:hover {
-  background: rgba(255,255,255,0.35);
+  background: #f5f7fd;
+  color: var(--tag-bg, #1677ff);
 }
 .session-list {
   flex: 1;
@@ -379,11 +381,11 @@ onUnmounted(() => {
   transition: background 0.2s;
 }
 .session-item:hover {
-  background: #f0f7ff;
+  background: #f5f7fd;
 }
 .session-item.active {
-  background: #e6f4ff;
-  border-left: 3px solid #1677ff;
+  background: rgba(22,119,255,0.06);
+  border-left: 3px solid var(--tag-bg, #1677ff);
 }
 .session-info {
   display: flex;
@@ -394,7 +396,7 @@ onUnmounted(() => {
 .session-id {
   font-weight: 600;
   font-size: 13px;
-  color: #333;
+  color: #303133;
 }
 .session-status {
   font-size: 11px;
@@ -433,8 +435,9 @@ onUnmounted(() => {
   justify-content: space-between;
   align-items: center;
   padding: 14px 16px;
-  background: linear-gradient(135deg, var(--tag-bg, #1677ff), #1677ff);
-  color: #fff;
+  background: #fff;
+  border-bottom: 1px solid #f0f0f0;
+  color: #303133;
   font-weight: 600;
   position: relative;
 }
@@ -461,13 +464,14 @@ onUnmounted(() => {
 }
 .header-icon {
   font-size: 18px;
+  color: var(--tag-bg, #1677ff);
 }
 .hamburger-btn {
   background: none;
   border: none;
   cursor: pointer;
   font-size: 20px;
-  color: #fff;
+  color: #606266;
   padding: 0;
   display: flex;
   align-items: center;
@@ -483,24 +487,26 @@ onUnmounted(() => {
   gap: 4px;
 }
 .end-btn {
-  background: rgba(255,255,255,0.2);
-  color: #fff;
-  border: none;
+  background: transparent;
+  color: #e8494e;
+  border: 1px solid #fde2e2;
   border-radius: 6px;
   padding: 4px 12px;
   font-size: 13px;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
 }
 .end-btn:hover {
-  background: rgba(255,255,255,0.35);
+  background: #e8494e;
+  color: #fff;
+  border-color: #e8494e;
 }
 .msg-list {
   flex: 1;
   overflow-y: auto;
   padding: 20px;
   scroll-behavior: smooth;
-  background: #fff;
+  background: #f5f7fd;
 }
 .msg {
   margin-bottom: 16px;
@@ -526,16 +532,16 @@ onUnmounted(() => {
   font-size: 18px;
 }
 .msg.user .avatar {
-  background: #e8e8e8;
-  color: #666;
+  background: #f0f0f0;
+  color: #909399;
 }
 .msg.admin .avatar {
-  background: #1677ff;
+  background: var(--tag-bg, #1677ff);
   color: #fff;
 }
 .msg.system .avatar {
   background: #f5f5f5;
-  color: #999;
+  color: #bbb;
 }
 .msg .bubble {
   max-width: 65%;
@@ -546,18 +552,19 @@ onUnmounted(() => {
   word-break: break-word;
 }
 .msg.user .bubble {
-  background: #f5f5f5;
-  color: #333;
+  background: #fff;
+  color: #303133;
+  border: 1px solid #f0f0f0;
   border-bottom-left-radius: 4px;
 }
 .msg.admin .bubble {
-  background: #1677ff;
+  background: var(--tag-bg, #1677ff);
   color: #fff;
   border-bottom-right-radius: 4px;
 }
 .msg.system .bubble {
-  background: #f5f5f5;
-  color: #999;
+  background: transparent;
+  color: #bbb;
   font-style: italic;
 }
 .input-area {
@@ -661,7 +668,7 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #1677ff;
+  background: var(--tag-bg, #1677ff);
   color: #fff;
   transition: all 0.2s;
   padding: 0;
