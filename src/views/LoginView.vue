@@ -48,7 +48,7 @@ const canvasRef = ref<HTMLCanvasElement | null>(null)
 
 const mouse = { x: 0, y: 0 }
 const parallax = ref({ x: 0, y: 0 })
-const factors = [20, 14, 28]
+const factors = [45, 30, 60]
 
 function parallaxStyle(i: number) {
   const f = factors[i]
@@ -116,7 +116,11 @@ function initParticles() {
   const tick = () => {
     const w = parent.clientWidth
     const h = parent.clientHeight
-    ctx.clearRect(0, 0, w, h)
+    const ox = parallax.value.x * 25
+    const oy = parallax.value.y * 25
+    ctx.clearRect(-50, -50, w + 100, h + 100)
+    ctx.save()
+    ctx.translate(ox, oy)
 
     for (const p of particles) {
       p.x += p.vx
@@ -146,6 +150,7 @@ function initParticles() {
         }
       }
     }
+    ctx.restore()
     raf = requestAnimationFrame(tick)
   }
   tick()
@@ -186,10 +191,10 @@ onBeforeUnmount(() => {
   position: absolute;
   border-radius: 50%;
   filter: blur(50px);
-  opacity: 0.5;
+  opacity: 0.55;
   pointer-events: none;
   will-change: transform;
-  transition: transform 0.6s ease-out;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .blob-1 {
   width: 360px; height: 360px;
