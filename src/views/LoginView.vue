@@ -103,16 +103,16 @@ function initParticles() {
   }
   resize()
 
-  const count = 70
+  const count = 90
   particles = Array.from({ length: count }, () => ({
     x: Math.random() * parent.clientWidth,
     y: Math.random() * parent.clientHeight,
     vx: (Math.random() - 0.5) * 0.3,
     vy: (Math.random() - 0.5) * 0.3,
-    r: Math.random() * 1.2 + 0.4,
+    r: Math.random() * 1.8 + 0.8,
   }))
 
-  const maxDist = 130
+  const maxDist = 140
   const tick = () => {
     const w = parent.clientWidth
     const h = parent.clientHeight
@@ -127,7 +127,7 @@ function initParticles() {
       else if (p.y > h) p.y = 0
       ctx.beginPath()
       ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2)
-      ctx.fillStyle = 'rgba(120,160,255,0.4)'
+      ctx.fillStyle = 'rgba(70,120,235,0.75)'
       ctx.fill()
     }
 
@@ -140,7 +140,7 @@ function initParticles() {
           ctx.beginPath()
           ctx.moveTo(particles[i].x, particles[i].y)
           ctx.lineTo(particles[j].x, particles[j].y)
-          ctx.strokeStyle = `rgba(120,160,255,${(1 - dist / maxDist) * 0.15})`
+          ctx.strokeStyle = `rgba(70,120,235,${(1 - dist / maxDist) * 0.45})`
           ctx.lineWidth = 1
           ctx.stroke()
         }
