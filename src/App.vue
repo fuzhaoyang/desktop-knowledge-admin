@@ -55,8 +55,9 @@
               <MenuUnfoldOutlined v-else />
             </button>
             <div class="toolbar-spacer" />
-            <button v-if="isLoggedIn" class="collapse-trigger" title="退出登录" @click="onLogout">
+            <button v-if="isLoggedIn" class="logout-btn" @click="onLogout">
               <LogoutOutlined />
+              <span>退出登录</span>
             </button>
           </div>
           <div class="content-wrap">
@@ -146,5 +147,24 @@ body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: #
 }
 .collapse-trigger:hover { background: #f5f7fd; color: #1677ff; }
 .toolbar-spacer { flex: 1; }
+.logout-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 14px;
+  border: 1px solid #fde2e2;
+  border-radius: 6px;
+  background: #fef0f0;
+  color: #e8494e;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+.logout-btn:hover {
+  background: #e8494e;
+  color: #fff;
+  border-color: #e8494e;
+}
 .content-wrap { flex: 1; overflow: hidden; }
 </style>
