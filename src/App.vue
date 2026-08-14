@@ -47,7 +47,7 @@
               {{ $t('chat.adminTitle') }}
             </a-menu-item>
           </a-menu>
-          <div v-if="!collapsed" class="sidebar-version">v1.0.0</div>
+          <div v-if="!collapsed" class="sidebar-version">当前版本v1.0.0</div>
         </aside>
         <main class="app-main">
           <div class="content-toolbar">
