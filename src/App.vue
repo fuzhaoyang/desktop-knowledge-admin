@@ -47,6 +47,7 @@
               {{ $t('chat.adminTitle') }}
             </a-menu-item>
           </a-menu>
+          <div v-if="!collapsed" class="sidebar-version">v1.0.0</div>
         </aside>
         <main class="app-main">
           <div class="content-toolbar">
@@ -186,10 +187,20 @@ body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: #
   border-right: 1px solid #f0f0f0;
   overflow-y: auto;
   overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
   transition: width 0.2s ease;
 }
 .app-sidebar.collapsed { width: 64px; }
-.sidebar-menu { border-inline-end: none !important; }
+.sidebar-menu { border-inline-end: none !important; flex: 1; }
+.sidebar-version {
+  flex-shrink: 0;
+  padding: 12px 20px;
+  font-size: 12px;
+  color: #c0c4cc;
+  text-align: center;
+  border-top: 1px solid #f0f0f0;
+}
 .app-main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
 .content-toolbar {
   flex-shrink: 0;
