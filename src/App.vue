@@ -59,7 +59,8 @@ const collapsed = ref(false)
 const tab = ref<'knowledge' | 'admin'>('knowledge')
 const knowledgeTab = ref('file')
 
-function onMenuClick({ key, keyPath }: MenuItem) {
+function onMenuClick(info: { key: string; keyPath: string[] }) {
+  const { key } = info
   if (key === 'admin') {
     tab.value = 'admin'
     return

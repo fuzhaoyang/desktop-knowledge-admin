@@ -306,7 +306,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted, watch } from 'vue';
+import { defineComponent, ref, onMounted, watch, computed } from 'vue';
 
 const API_BASE = 'https://code-nav.top'
 import { UploadOutlined, InfoCircleOutlined, EditOutlined, BulbOutlined, CheckCircleOutlined, FileOutlined, BookOutlined, LinkOutlined } from '@ant-design/icons-vue';
@@ -812,7 +812,7 @@ export default defineComponent({
       if (file) uploadFile(file);
     }
 
-    return { activeTab: props.activeTab, fileInput, uploading, verifying, result, secretKey, uploadedFileId, uploadedFileName, triggerUpload, onFileSelected, onDrop, submitVerify, textContent, textSecretKey, textSubmitting, submitText, crawlUrl, crawlSecretKey, crawlSubmitting, crawlMode, submitCrawl, menuCrawlUrl, menuCrawlSecretKey, menuCrawlSubmitting, menuCrawlResult, submitMenuCrawl, stats, entries, loading, searchText, pagination, columns, loadEntries, handleTableChange, handleExpand, deleteEntry, showDeleteModal, showBatchDeleteModal, confirmDelete, deleteModalVisible, deleteSecretKey, deleteLoading, selectedRowKeys, onSelectChange, isBatchDelete, failures, failuresLoading, failureColumns, loadFailures, fileList, fileListLoading, fileColumns, loadFileList, formatSize, showFileDeleteModal, confirmFileDelete, fileDeleteModalVisible, fileDeleteSecretKey, fileDeleteLoading, deletingFile, retryFile, showClearAllModal, confirmClearAll, clearAllModalVisible, clearAllSecretKey, clearAllLoading, currentModel, availableModels, pendingModel, modelSwitchModalVisible, modelSwitchSecretKey, modelSwitchLoading, showModelSwitchModal, confirmSwitchModel };
+    return { activeTab: computed(() => props.activeTab), fileInput, uploading, verifying, result, secretKey, uploadedFileId, uploadedFileName, triggerUpload, onFileSelected, onDrop, submitVerify, textContent, textSecretKey, textSubmitting, submitText, crawlUrl, crawlSecretKey, crawlSubmitting, crawlMode, submitCrawl, menuCrawlUrl, menuCrawlSecretKey, menuCrawlSubmitting, menuCrawlResult, submitMenuCrawl, stats, entries, loading, searchText, pagination, columns, loadEntries, handleTableChange, handleExpand, deleteEntry, showDeleteModal, showBatchDeleteModal, confirmDelete, deleteModalVisible, deleteSecretKey, deleteLoading, selectedRowKeys, onSelectChange, isBatchDelete, failures, failuresLoading, failureColumns, loadFailures, fileList, fileListLoading, fileColumns, loadFileList, formatSize, showFileDeleteModal, confirmFileDelete, fileDeleteModalVisible, fileDeleteSecretKey, fileDeleteLoading, deletingFile, retryFile, showClearAllModal, confirmClearAll, clearAllModalVisible, clearAllSecretKey, clearAllLoading, currentModel, availableModels, pendingModel, modelSwitchModalVisible, modelSwitchSecretKey, modelSwitchLoading, showModelSwitchModal, confirmSwitchModel };
   }
 });
 </script>
