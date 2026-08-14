@@ -5,11 +5,6 @@
     <template v-else>
       <div class="app-body">
         <aside class="app-sidebar" :class="{ collapsed }">
-          <div class="sidebar-trigger" @click="collapsed = !collapsed">
-            <MenuFoldOutlined v-if="!collapsed" />
-            <MenuUnfoldOutlined v-else />
-            <span v-if="!collapsed" class="trigger-text">收起菜单</span>
-          </div>
           <a-menu
             v-model:selectedKeys="selectedKeys"
             v-model:openKeys="openKeys"
@@ -34,8 +29,16 @@
           </a-menu>
         </aside>
         <main class="app-main">
-          <KnowledgeView v-if="tab === 'knowledge'" :active-tab="knowledgeTab" />
-          <AdminChatView v-if="tab === 'admin'" />
+          <div class="content-toolbar">
+            <button class="collapse-trigger" @click="collapsed = !collapsed" :title="collapsed ? '展开菜单' : '收起菜单'">
+              <MenuFoldOutlined v-if="!collapsed" />
+              <MenuUnfoldOutlined v-else />
+            </button>
+          </div>
+          <div class="content-wrap">
+            <KnowledgeView v-if="tab === 'knowledge'" :active-tab="knowledgeTab" />
+            <AdminChatView v-if="tab === 'admin'" />
+          </div>
         </main>
       </div>
     </template>
@@ -91,19 +94,29 @@ body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: #
   transition: width 0.2s ease;
 }
 .app-sidebar.collapsed { width: 64px; }
-.sidebar-trigger {
+.sidebar-menu { border-inline-end: none !important; }
+.app-main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+.content-toolbar {
+  flex-shrink: 0;
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 10px 18px;
-  color: #606266;
-  font-size: 13px;
-  cursor: pointer;
+  padding: 8px 12px;
+  background: #fff;
   border-bottom: 1px solid #f0f0f0;
 }
-.sidebar-trigger:hover { color: #1677ff; }
-.app-sidebar.collapsed .sidebar-trigger { padding: 10px 22px; }
-.trigger-text { white-space: nowrap; }
-.sidebar-menu { border-inline-end: none !important; }
-.app-main { flex: 1; overflow: hidden; }
+.collapse-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: #606266;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+.collapse-trigger:hover { background: #f5f7fd; color: #1677ff; }
+.content-wrap { flex: 1; overflow: hidden; }
 </style>
