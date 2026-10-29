@@ -4,6 +4,8 @@ import en from './lang/en';
 const lang = (typeof window !== 'undefined' && localStorage.getItem('lang')) || 'zh_CN';
 
 const i18n = createI18n({
+  legacy: false,
+  globalInjection: true,
   locale: lang, // 默认显示语音
   messages: {
     zh_CN, // 中文

@@ -8,23 +8,14 @@
           <p>{{ $t('knowledgeUploadDesc') }}</p>
 
           <div v-if="activeTab === 'file'">
-            <div v-if="!uploadedFileId" class="upload-area" @dragover.prevent @drop.prevent="onDrop" @click="triggerUpload">
+            <div class="upload-area" @dragover.prevent @drop.prevent="onDrop" @click="triggerUpload">
               <UploadOutlined class="upload-icon" />
               <p>{{ $t('knowledgeDrag') }}</p>
-              <p class="hint">支持 .txt / .md / .pdf / .docx 格式</p>
-              <input ref="fileInput" type="file" accept=".txt,.md,.pdf,.docx,.doc" style="display:none" @change="onFileSelected" />
+              <p class="hint">支持 .txt / .md / .pdf / .docx / .doc / .xlsx / .csv / .tsv / .pptx 格式</p>
+              <input ref="fileInput" type="file" accept=".txt,.md,.pdf,.docx,.doc,.xlsx,.csv,.tsv,.pptx" style="display:none" @change="onFileSelected" />
             </div>
 
             <div v-if="uploading" class="status uploading">{{ $t('knowledgeUploading') }}</div>
-
-            <div v-if="uploadedFileId" class="verify-area">
-              <div class="file-info">已上传文件：{{ uploadedFileName }}</div>
-              <div class="secret-row">
-                <label>验证码：</label>
-                <input v-model="secretKey" type="password" class="secret-input" placeholder="请输入验证码" @keydown.enter="submitVerify" />
-                <button class="submit-btn" :disabled="!secretKey || verifying" @click="submitVerify">{{ verifying ? '验证中...' : '提交' }}</button>
-              </div>
-            </div>
           </div>
 
           <div v-if="activeTab === 'text'" class="text-input-area">
@@ -117,6 +108,7 @@
                 批量删除 ({{ selectedRowKeys.length }})
               </a-button>
               <a-button danger @click="showClearAllModal" style="margin-left: 8px">一键清除所有文章</a-button>
+              <a-button @click="confirmSync" :loading="syncLoading" style="margin-left: 8px">{{ $t('knowledgeSyncData') }}</a-button>
             </div>
 
             <a-table
@@ -253,9 +245,9 @@
               <h4><UploadOutlined /> 文件上传</h4>
               <ul>
                 <li><CheckCircleOutlined /> 在"文件上传"标签页下，拖拽文件到虚线区域，或点击该区域选择文件</li>
-                <li><CheckCircleOutlined /> 支持 .txt / .md / .pdf / .docx / .doc 格式</li>
-                <li><CheckCircleOutlined /> 文件上传后，页面会显示文件名，输入验证码后点击"提交"</li>
-                <li><CheckCircleOutlined /> 系统自动提取文件内容并切片存入向量数据库，提交成功后显示切片数量</li>
+                <li><CheckCircleOutlined /> 支持 .txt / .md / .pdf / .docx / .doc / .xlsx / .csv / .tsv / .pptx 格式</li>
+                <li><CheckCircleOutlined /> 上传后自动进行文档质检，通过后点击"提交入库"</li>
+                <li><CheckCircleOutlined /> 未通过可"帮我修复"，或选择"仍要上传"强制入库</li>
               </ul>
             </div>
 
@@ -290,6 +282,60 @@
         </article>
       </a-col>
     </a-row>
+
+    <!-- 文档质检评分弹窗 -->
+    <div v-if="scoreModalVisible" class="score-modal-mask">
+      <div class="score-modal" :style="scoreModalStyle" @mousedown="startScoreDrag">
+        <button class="score-close" @click="closeScoreModal">×</button>
+        <h4 class="score-title">📋 {{ $t('knowledgeScoreTitle') }}<span v-if="uploadedFileName" class="score-filename"> · {{ uploadedFileName }}</span></h4>
+        <div v-if="!scoreResult" class="score-analyzing">
+          <a-progress type="circle" :percent="scoreAnim" :width="120" :stroke-color="progressColor" />
+          <p class="score-tip">{{ scoreStage || $t('knowledgeScoreAnalyzing') }}</p>
+        </div>
+        <div v-else>
+          <div class="score-result-head" :class="scoreClass">
+            <span class="score-big">{{ scoreResult.total_score }}</span><span class="score-slash">/100</span>
+            <span class="score-badge">{{ scoreBadgeText }}</span>
+          </div>
+          <div class="score-dims">
+            <div v-for="(label, key) in scoreDimLabels" :key="key" class="score-dim">
+              <span>{{ label }}</span>
+              <div class="score-bar"><div class="score-bar-fill" :style="{ width: (scoreResult.dimensions?.[key] || 0) + '%' }"></div></div>
+              <b>{{ scoreResult.dimensions?.[key] || 0 }}</b>
+            </div>
+          </div>
+          <div v-if="scoreResult.issues?.length" class="score-issues">
+            <div v-for="(iss, i) in scoreResult.issues" :key="i" class="score-issue">• {{ iss }}</div>
+          </div>
+          <div v-if="scoreResult.suggestion" class="score-suggestion">💡 {{ scoreResult.suggestion }}</div>
+          <div v-if="scoreResult.score_failed" class="score-fail">❌ {{ $t('knowledgeScoreServiceFailed') }}</div>
+          <div v-if="fixedResult && !fixedResult.is_passed" class="score-fail">{{ $t('knowledgeScoreFixedNotPassed', { score: fixedResult.total_score }) }}</div>
+          <div class="score-actions">
+            <button v-if="scoreResult.is_passed && !scoreResult.score_failed && !fixedResult" class="btn-submit" :disabled="verifying" @click="submitVerify()"><span v-if="verifying" class="btn-spinner"></span>{{ verifying ? $t('knowledgeScoreSubmitting') : $t('knowledgeScoreSubmit') }}</button>
+            <button v-if="scoreResult && !scoreResult.is_passed && !scoreResult.score_failed && !fixedResult" class="btn-fix" :disabled="fixing" @click="startFix"><span v-if="fixing" class="btn-spinner"></span>{{ fixing ? $t('knowledgeScoreFixing') : $t('knowledgeScoreFix') }}</button>
+            <template v-if="fixedResult">
+              <div class="score-actions fix-actions">
+                <button class="btn-view" @click="compareVisible = true">👁 {{ $t('knowledgeScoreViewCompare') }}</button>
+                <button v-if="fixedResult.is_passed" class="btn-submit" :disabled="verifying" @click="submitVerify(true)"><span v-if="verifying" class="btn-spinner"></span>{{ verifying ? $t('knowledgeScoreSubmitting') : $t('knowledgeScoreUploadFixed') }}</button>
+              </div>
+            </template>
+            <button v-if="scoreResult && !scoreResult.is_passed && !verifying && uploadedFileId && !scoreExpired" class="btn-force" :disabled="verifying" @click="forceUpload">{{ $t('knowledgeScoreForce') }}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 原文 vs 修复版对比弹窗 -->
+    <div v-if="compareVisible" class="score-modal-mask">
+      <div class="score-modal compare-modal">
+        <button class="score-close" @click="compareVisible = false">×</button>
+        <h4 class="score-title">📊 {{ $t('knowledgeScoreCompareTitle') }}</h4>
+        <div class="fix-compare">
+          <div class="fix-col"><div class="fix-col-title">{{ $t('knowledgeScoreOriginal') }}</div><pre class="fix-text">{{ originalContent }}</pre></div>
+          <div class="fix-col"><div class="fix-col-title">{{ $t('knowledgeScoreFixed') }}</div><pre class="fix-text">{{ fixedContent }}</pre></div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -297,8 +343,10 @@
 import { defineComponent, ref, onMounted, watch, computed } from 'vue';
 
 const API_BASE = 'https://code-nav.top'
+const WS_BASE = 'wss://code-nav.top'
 import { UploadOutlined, InfoCircleOutlined, EditOutlined, BulbOutlined, CheckCircleOutlined, FileOutlined, BookOutlined, LinkOutlined } from '@ant-design/icons-vue';
-import { message } from 'ant-design-vue';
+import { message, Modal } from 'ant-design-vue';
+import { useI18n } from 'vue-i18n';
 
 const meta = {
   title: '知识库管理_前端小阳仔',
@@ -313,11 +361,11 @@ export default defineComponent({
   components: { UploadOutlined, InfoCircleOutlined, EditOutlined, BulbOutlined, CheckCircleOutlined, FileOutlined, BookOutlined, LinkOutlined },
   props: { activeTab: { type: String, required: true } },
   setup(props) {
+    const { t } = useI18n();
     const fileInput = ref<HTMLInputElement | null>(null);
     const uploading = ref(false);
     const verifying = ref(false);
     const result = ref<{ success: boolean; message: string } | null>(null);
-    const secretKey = ref('');
     const uploadedFileId = ref('');
     const uploadedFileName = ref('');
 
@@ -376,6 +424,333 @@ export default defineComponent({
     const clearAllModalVisible = ref(false);
     const clearAllSecretKey = ref('');
     const clearAllLoading = ref(false);
+    const syncLoading = ref(false);
+
+    const scoreModalVisible = ref(false);
+    const scoreAnim = ref(0);
+    const scoreStage = ref('');
+    const scoreResult = ref<null | { total_score: number; is_passed: boolean; vetoed?: boolean; score_failed?: boolean; dimensions?: Record<string, number>; issues?: string[]; suggestion?: string }>(null);
+    const scoreExpired = ref(false);
+    const fixing = ref(false);
+    const fixedResult = ref<null | { total_score: number; is_passed: boolean }>(null);
+    const fixedContent = ref('');
+    const originalContent = ref('');
+    const compareVisible = ref(false);
+    const scoreTimer = ref<ReturnType<typeof setInterval> | null>(null);
+    const scoreDrag = ref({ moved: false, dragging: false, x: 0, y: 0, left: 0, top: 0 });
+    const scoreModalStyle = computed(() => {
+      const d = scoreDrag.value;
+      return d.moved ? { position: 'fixed' as const, left: d.left + 'px', top: d.top + 'px', margin: 0 } : {};
+    });
+    const scoreDimLabels = computed<Record<string, string>>(() => ({
+      content_quality: t('knowledgeScoreDimContent'),
+      ai_readiness: t('knowledgeScoreDimAi'),
+      language_quality: t('knowledgeScoreDimLanguage'),
+      compliance: t('knowledgeScoreDimCompliance')
+    }));
+    const scoreClass = computed(() => {
+      const s = scoreResult.value?.total_score ?? 0;
+      return s >= 85 ? 'score-green' : s >= 70 ? 'score-yellow' : 'score-red';
+    });
+    const progressColor = computed(() => {
+      const p = scoreAnim.value;
+      if (p >= 95) return '#52c41a';
+      if (p >= 40) return '#faad14';
+      return '#1677ff';
+    });
+    const scoreBadgeText = computed(() => {
+      const s = scoreResult.value?.total_score ?? 0;
+      return s >= 85 ? t('knowledgeScoreBadgeExcellent') : s >= 70 ? t('knowledgeScoreBadgePass') : t('knowledgeScoreBadgeFail');
+    });
+
+    let scoreWs: WebSocket | null = null;
+    let scoreReconnectTimer: ReturnType<typeof setTimeout> | null = null;
+    let scorePollTimer: ReturnType<typeof setInterval> | null = null;
+    let scoreDeadline = 0;
+    let scoreTerminal = false;
+
+    function closeScoreWs() {
+      if (!scoreWs) return;
+      scoreWs.onopen = null;
+      scoreWs.onmessage = null;
+      scoreWs.onerror = null;
+      scoreWs.onclose = null;
+      try { scoreWs.close(); } catch {}
+      scoreWs = null;
+    }
+
+    function clearScoreNet() {
+      if (scoreReconnectTimer) {
+        clearTimeout(scoreReconnectTimer);
+        scoreReconnectTimer = null;
+      }
+      if (scorePollTimer) {
+        clearInterval(scorePollTimer);
+        scorePollTimer = null;
+      }
+      closeScoreWs();
+    }
+
+    function stopScoreNet() {
+      scoreTerminal = true;
+      clearScoreNet();
+    }
+
+    function resetScoreNet() {
+      stopScoreNet();
+      scoreTerminal = false;
+      scoreDeadline = Date.now() + 3 * 60 * 1000;
+    }
+
+    function startScoreDrag(e: MouseEvent) {
+      const target = e.target as HTMLElement;
+      if (target.closest('button, a, input, textarea, select, .ant-progress, .score-actions, .score-dims, .score-issues, .score-result-head, .score-analyzing')) return;
+      const el = target.closest('.score-modal') as HTMLElement | null;
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      scoreDrag.value = { moved: true, dragging: true, x: e.clientX, y: e.clientY, left: rect.left, top: rect.top };
+      document.addEventListener('mousemove', onScoreDragMove);
+      document.addEventListener('mouseup', endScoreDrag);
+      e.preventDefault();
+    }
+    function onScoreDragMove(e: MouseEvent) {
+      const d = scoreDrag.value;
+      if (!d.dragging) return;
+      d.left = Math.max(0, d.left + e.clientX - d.x);
+      d.top = Math.max(0, d.top + e.clientY - d.y);
+      d.x = e.clientX;
+      d.y = e.clientY;
+    }
+    function endScoreDrag() {
+      scoreDrag.value.dragging = false;
+      document.removeEventListener('mousemove', onScoreDragMove);
+      document.removeEventListener('mouseup', endScoreDrag);
+    }
+
+    function stopScoreAnim() {
+      if (scoreTimer.value) {
+        clearInterval(scoreTimer.value);
+        scoreTimer.value = null;
+      }
+      scoreAnim.value = 100;
+    }
+
+    function closeScoreModal() {
+      stopScoreNet();
+      stopScoreAnim();
+      scoreModalVisible.value = false;
+      scoreResult.value = null;
+      scoreStage.value = '';
+      scoreExpired.value = false;
+      fixedResult.value = null;
+      fixing.value = false;
+      fixedContent.value = '';
+      originalContent.value = '';
+      compareVisible.value = false;
+      uploadedFileId.value = '';
+      uploadedFileName.value = '';
+      result.value = null;
+    }
+
+    function applyScore(score: typeof scoreResult.value) {
+      stopScoreAnim();
+      scoreResult.value = score;
+    }
+
+    function failScore(issues: string[], suggestion: string) {
+      applyScore({ total_score: 0, is_passed: false, score_failed: true, issues, suggestion });
+      stopScoreNet();
+    }
+
+    function handleScoreMessage(raw: string) {
+      let d: {
+        status?: string;
+        percent?: number;
+        stage?: string;
+        score?: typeof scoreResult.value;
+        fixed_content?: string;
+        original_content?: string;
+      };
+      try { d = JSON.parse(raw); } catch { return; }
+      if (d.status === 'progress') {
+        scoreAnim.value = Math.max(scoreAnim.value, d.percent || 0);
+        scoreStage.value = d.stage || scoreStage.value;
+      } else if (d.status === 'fix_done') {
+        fixing.value = false;
+        fixedResult.value = d.score || null;
+        fixedContent.value = d.fixed_content || '';
+        originalContent.value = d.original_content || '';
+        if (d.score) applyScore(d.score);
+        else failScore([t('knowledgeScoreServiceFailed')], '');
+        stopScoreNet();
+      } else if (d.status === 'done') {
+        if (d.score) applyScore(d.score);
+        else failScore([t('knowledgeScoreServiceFailed')], '');
+        stopScoreNet();
+      }
+    }
+
+    function pollScoreStatus(fileId: string) {
+      if (scorePollTimer || fixing.value) return;
+      scorePollTimer = setInterval(async () => {
+        if (scoreTerminal || !uploadedFileId.value) return;
+        if (Date.now() > scoreDeadline) {
+          failScore([t('knowledgeScoreTimeout')], t('knowledgeScoreTimeoutTip'));
+          scoreExpired.value = true;
+          return;
+        }
+        try {
+          const res = await fetch(API_BASE + '/api/aiuploadfile/score-status?file_id=' + encodeURIComponent(fileId));
+          const data = await res.json();
+          if (data.status === 'done' && data.score) {
+            applyScore(data.score);
+            stopScoreNet();
+          } else if (data.status === 'expired') {
+            scoreExpired.value = true;
+            failScore([t('knowledgeScoreExpired')], t('knowledgeScoreExpiredTip'));
+          }
+        } catch {}
+      }, 2000);
+    }
+
+    function scheduleScoreReconnect(fileId: string) {
+      if (scoreTerminal || !uploadedFileId.value) return;
+      if (Date.now() > scoreDeadline) {
+        scoreExpired.value = true;
+        failScore([t('knowledgeScoreTimeout')], t('knowledgeScoreTimeoutTip'));
+        return;
+      }
+      if (!fixing.value) pollScoreStatus(fileId);
+      if (scoreReconnectTimer) return;
+      scoreReconnectTimer = setTimeout(() => {
+        scoreReconnectTimer = null;
+        connectScoreWs(fileId);
+      }, 2000);
+    }
+
+    function connectScoreWs(fileId: string) {
+      if (scoreTerminal || !uploadedFileId.value) return;
+      closeScoreWs();
+      const ws = new WebSocket(WS_BASE + '/ws/doc-score');
+      scoreWs = ws;
+      ws.onopen = () => {
+        if (scorePollTimer) {
+          clearInterval(scorePollTimer);
+          scorePollTimer = null;
+        }
+        ws.send(JSON.stringify({ file_id: fileId }));
+      };
+      ws.onmessage = (e) => handleScoreMessage(String(e.data));
+      ws.onerror = () => {
+        try { ws.close(); } catch {}
+      };
+      ws.onclose = () => {
+        if (scoreTerminal || !uploadedFileId.value) return;
+        scheduleScoreReconnect(fileId);
+      };
+    }
+
+    async function uploadFile(file: File) {
+      const formData = new FormData();
+      formData.append('file', file);
+      uploading.value = true;
+      result.value = null;
+      scoreResult.value = null;
+      scoreExpired.value = false;
+      fixedResult.value = null;
+      scoreModalVisible.value = true;
+      scoreAnim.value = 0;
+      scoreStage.value = '';
+      resetScoreNet();
+      try {
+        const res = await fetch(API_BASE + '/api/aiuploadfile', { method: 'POST', body: formData });
+        const data = await res.json();
+        if (!scoreModalVisible.value) return;
+        if (!res.ok) {
+          failScore([data.detail || t('knowledgeUploadFailed')], '');
+          result.value = { success: false, message: data.detail || t('knowledgeUploadFailed') };
+        } else {
+          uploadedFileId.value = data.file_id;
+          uploadedFileName.value = data.filename;
+          connectScoreWs(data.file_id);
+        }
+      } catch {
+        if (!scoreModalVisible.value) return;
+        failScore([t('knowledgeUploadNetworkError')], '');
+        result.value = { success: false, message: t('knowledgeUploadNetworkError') };
+      } finally {
+        uploading.value = false;
+      }
+    }
+
+    async function startFix() {
+      if (!uploadedFileId.value || fixing.value) return;
+      fixing.value = true;
+      fixedResult.value = null;
+      scoreResult.value = null;
+      scoreExpired.value = false;
+      scoreStage.value = '';
+      scoreAnim.value = 0;
+      resetScoreNet();
+      try {
+        const fd = new FormData();
+        fd.append('file_id', uploadedFileId.value);
+        const res = await fetch(API_BASE + '/api/aiuploadfile/fix', { method: 'POST', body: fd });
+        if (!res.ok) {
+          const data = await res.json();
+          throw new Error(data.detail || '');
+        }
+        connectScoreWs(uploadedFileId.value);
+      } catch (e) {
+        fixing.value = false;
+        stopScoreNet();
+        failScore([e instanceof Error && e.message ? e.message : t('knowledgeScoreServiceFailed')], '');
+      }
+    }
+
+    async function submitVerify(ack = false, useFixed = false) {
+      if (!uploadedFileId.value) return;
+      verifying.value = true;
+      result.value = null;
+      try {
+        const formData = new FormData();
+        formData.append('file_id', uploadedFileId.value);
+        if (ack) formData.append('score_ack', '1');
+        if (useFixed) formData.append('fixed', '1');
+        if (fixedResult.value) formData.append('fixed', '1');
+        const res = await fetch(API_BASE + '/api/aiuploadfile/verify', { method: 'POST', body: formData });
+        const data = await res.json();
+        if (!res.ok) {
+          if (data.detail && data.detail.includes('已存在')) {
+            message.error(data.detail);
+          } else {
+            result.value = { success: false, message: data.detail || t('knowledgeVerifyFailed') };
+          }
+        } else {
+          result.value = data;
+          uploadedFileId.value = '';
+          message.success(t('knowledgeUploadSuccess'));
+          loadStats();
+          loadEntries();
+          setTimeout(closeScoreModal, 1000);
+        }
+      } catch {
+        result.value = { success: false, message: t('knowledgeVerifyNetworkError') };
+      } finally {
+        verifying.value = false;
+      }
+    }
+
+    function forceUpload() {
+      Modal.confirm({
+        title: t('knowledgeScoreForceTitle'),
+        content: t('knowledgeScoreForceContent'),
+        okText: t('knowledgeScoreForceOk'),
+        okType: 'danger',
+        cancelText: t('knowledgeScoreCancel'),
+        onOk: () => submitVerify(true)
+      });
+    }
 
     onMounted(() => {
       loadStats();
@@ -395,53 +770,6 @@ export default defineComponent({
 
     function triggerUpload() {
       if (!uploadedFileId.value) fileInput.value?.click();
-    }
-
-    async function uploadFile(file: File) {
-      const formData = new FormData();
-      formData.append('file', file);
-      uploading.value = true;
-      result.value = null;
-      try {
-        const res = await fetch(API_BASE + '/api/aiuploadfile', { method: 'POST', body: formData });
-        const data = await res.json();
-        if (!res.ok) {
-          result.value = { success: false, message: data.detail || '上传失败' };
-        } else {
-          uploadedFileId.value = data.file_id;
-          uploadedFileName.value = data.filename;
-          result.value = { success: true, message: data.message };
-        }
-      } catch {
-        result.value = { success: false, message: '上传失败：网络错误' };
-      } finally {
-        uploading.value = false;
-      }
-    }
-
-    async function submitVerify() {
-      if (!secretKey.value || !uploadedFileId.value) return;
-      verifying.value = true;
-      result.value = null;
-      try {
-        const formData = new FormData();
-        formData.append('file_id', uploadedFileId.value);
-        formData.append('secret_key', secretKey.value);
-        const res = await fetch(API_BASE + '/api/aiuploadfile/verify', { method: 'POST', body: formData });
-        const data = await res.json();
-        if (!res.ok) {
-          result.value = { success: false, message: data.detail || '验证失败' };
-        } else {
-          result.value = data;
-          uploadedFileId.value = '';
-          uploadedFileName.value = '';
-          secretKey.value = '';
-        }
-      } catch {
-        result.value = { success: false, message: '验证失败：网络错误' };
-      } finally {
-        verifying.value = false;
-      }
     }
 
     async function submitText() {
@@ -636,6 +964,25 @@ export default defineComponent({
       }
     }
 
+    async function confirmSync() {
+      syncLoading.value = true;
+      try {
+        const res = await fetch(API_BASE + '/api/sync', { method: 'POST' });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          message.success(data.message || t('knowledgeSyncSuccess'));
+        } else {
+          message.error(data.message || t('knowledgeSyncFailed'));
+        }
+        loadStats();
+        loadEntries();
+      } catch {
+        message.error(t('knowledgeSyncNetworkError'));
+      } finally {
+        syncLoading.value = false;
+      }
+    }
+
     async function retryFile(record: { filename: string }) {
       try {
         const res = await fetch(API_BASE + '/api/file-update/retry?filename=' + encodeURIComponent(record.filename), {
@@ -751,7 +1098,7 @@ export default defineComponent({
       if (file) uploadFile(file);
     }
 
-    return { activeTab: computed(() => props.activeTab), fileInput, uploading, verifying, result, secretKey, uploadedFileId, uploadedFileName, triggerUpload, onFileSelected, onDrop, submitVerify, textContent, textSecretKey, textSubmitting, submitText, crawlUrl, crawlSecretKey, crawlSubmitting, crawlMode, submitCrawl, menuCrawlUrl, menuCrawlSecretKey, menuCrawlSubmitting, menuCrawlResult, submitMenuCrawl, stats, entries, loading, searchText, pagination, columns, loadEntries, handleTableChange, handleExpand, deleteEntry, showDeleteModal, showBatchDeleteModal, confirmDelete, deleteModalVisible, deleteSecretKey, deleteLoading, selectedRowKeys, onSelectChange, isBatchDelete, failures, failuresLoading, failureColumns, loadFailures, fileList, fileListLoading, fileColumns, loadFileList, formatSize, showFileDeleteModal, confirmFileDelete, fileDeleteModalVisible, fileDeleteSecretKey, fileDeleteLoading, deletingFile, retryFile, showClearAllModal, confirmClearAll, clearAllModalVisible, clearAllSecretKey, clearAllLoading };
+    return { activeTab: computed(() => props.activeTab), fileInput, uploading, verifying, result, uploadedFileId, uploadedFileName, triggerUpload, onFileSelected, onDrop, submitVerify, forceUpload, startFix, scoreModalVisible, scoreAnim, scoreStage, scoreResult, scoreExpired, scoreClass, progressColor, scoreBadgeText, scoreDimLabels, scoreModalStyle, startScoreDrag, closeScoreModal, fixing, fixedResult, fixedContent, originalContent, compareVisible, textContent, textSecretKey, textSubmitting, submitText, crawlUrl, crawlSecretKey, crawlSubmitting, crawlMode, submitCrawl, menuCrawlUrl, menuCrawlSecretKey, menuCrawlSubmitting, menuCrawlResult, submitMenuCrawl, stats, entries, loading, searchText, pagination, columns, loadEntries, handleTableChange, handleExpand, deleteEntry, showDeleteModal, showBatchDeleteModal, confirmDelete, deleteModalVisible, deleteSecretKey, deleteLoading, selectedRowKeys, onSelectChange, isBatchDelete, failures, failuresLoading, failureColumns, loadFailures, fileList, fileListLoading, fileColumns, loadFileList, formatSize, showFileDeleteModal, confirmFileDelete, fileDeleteModalVisible, fileDeleteSecretKey, fileDeleteLoading, deletingFile, retryFile, showClearAllModal, confirmClearAll, clearAllModalVisible, clearAllSecretKey, clearAllLoading, confirmSync, syncLoading };
   }
 });
 </script>
@@ -1119,4 +1466,42 @@ export default defineComponent({
 .files-tab {
   margin: 20px 0;
 }
+.score-modal-mask { position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 1000; display: flex; align-items: center; justify-content: center; }
+.score-modal { position: relative; cursor: move; width: 420px; max-height: 80vh; overflow-y: auto; background: #fff; border-radius: 12px; padding: 24px; box-shadow: 0 8px 30px rgba(0,0,0,.2); }
+.score-modal button, .score-modal a, .score-modal input, .score-modal select, .score-modal .ant-progress, .score-modal .score-actions, .score-modal .score-dims, .score-modal .score-issues { cursor: auto; }
+.score-modal .score-bar { cursor: default; }
+.score-close { position: absolute; top: 8px; right: 12px; border: none; background: none; font-size: 20px; color: #999; cursor: pointer; line-height: 1; }
+.score-close:hover { color: #333; }
+.score-title { margin: 0 0 16px; font-size: 18px; text-align: center; cursor: move; user-select: none; }
+.score-analyzing { text-align: center; padding: 16px 0; }
+.score-tip { margin-top: 14px; color: #666; }
+.score-result-head { text-align: center; margin: 8px 0 14px; }
+.score-big { font-size: 40px; font-weight: 700; }
+.score-slash { color: #999; font-size: 16px; }
+.score-badge { display: inline-block; margin-left: 8px; padding: 2px 10px; border-radius: 10px; font-size: 13px; color: #fff; vertical-align: middle; }
+.score-green .score-big { color: #52c41a; } .score-green .score-badge { background: #52c41a; }
+.score-yellow .score-big { color: #faad14; } .score-yellow .score-badge { background: #faad14; }
+.score-red .score-big { color: #f5222d; } .score-red .score-badge { background: #f5222d; }
+.score-dims { margin: 10px 0; }
+.score-dim { display: flex; align-items: center; gap: 8px; margin: 6px 0; font-size: 13px; color: #555; }
+.score-dim .score-bar { flex: 1; height: 6px; background: #eee; border-radius: 3px; overflow: hidden; }
+.score-dim .score-bar-fill { height: 100%; background: #1677ff; border-radius: 3px; transition: width .4s; }
+.score-dim b { width: 28px; text-align: right; }
+.score-issues { background: #fff7e6; border-radius: 8px; padding: 10px 12px; color: #ad6800; font-size: 13px; margin: 8px 0; }
+.score-suggestion { background: #e6f7ff; border-radius: 8px; padding: 10px 12px; color: #0050b3; font-size: 13px; margin: 8px 0; }
+.score-fail { background: #fff1f0; border-radius: 8px; padding: 10px 12px; color: #cf1322; font-size: 13px; margin: 8px 0; }
+.score-actions { display: flex; align-items: center; gap: 10px; justify-content: flex-end; margin-top: 16px; }
+.score-actions button { padding: 6px 16px; height: 32px; box-sizing: border-box; border-radius: 6px; border: none; cursor: pointer; font-size: 14px; }
+.btn-spinner { display: inline-block; width: 14px; height: 14px; margin-right: 6px; border: 2px solid rgba(255,255,255,.35); border-top-color: #fff; border-radius: 50%; animation: btn-spin .7s linear infinite; vertical-align: -2px; }
+@keyframes btn-spin { to { transform: rotate(360deg); } }
+.btn-view { background: #722ed1; color: #fff; }
+.btn-fix { background: #faad14; color: #fff; margin-top: 16px; }
+.btn-submit { background: #52c41a; color: #fff; margin-top: 16px; }
+.btn-force { background: #909399; color: #fff; margin-top: 16px; }
+.compare-modal { width: 1500px; max-width: 95vw; max-height: 1000px; }
+.fix-compare { display: flex; gap: 10px; margin: 10px 0; }
+.fix-col { flex: 1; min-width: 0; }
+.fix-col-title { font-size: 12px; color: #888; margin-bottom: 4px; }
+.fix-text { max-height: 600px; overflow: auto; background: #fafafa; border: 1px solid #eee; border-radius: 6px; padding: 8px; font-size: 12px; white-space: pre-wrap; word-break: break-all; }
+.fix-actions { justify-content: flex-start; margin-top: 0; }
 </style>
