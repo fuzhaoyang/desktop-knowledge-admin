@@ -123,10 +123,10 @@
             >
               <template #bodyCell="{ column, record }">
                 <template v-if="column.key === 'type'">
-                  <FileOutlined v-if="record.type === 'file'" style="color:#1677ff" />
-                  <EditOutlined v-else-if="record.type === 'text'" style="color:#52c41a" />
+                  <FileOutlined v-if="record.type === 'file'" style="color:var(--accent)" />
+                  <EditOutlined v-else-if="record.type === 'text'" style="color:var(--ok)" />
                   <LinkOutlined v-else-if="record.type === 'crawl'" style="color:#722ed1" />
-                  <BookOutlined v-else style="color:#faad14" />
+                  <BookOutlined v-else style="color:var(--warn)" />
                   {{ record.type === 'file' ? '文件' : record.type === 'text' ? '文本' : record.type === 'crawl' ? '爬取' : '同步' }}
                 </template>
                 <template v-if="column.key === 'action'">
@@ -169,7 +169,7 @@
 
           <div v-if="activeTab === 'failures'" class="failures-tab">
             <div class="toolbar">
-              <span style="font-size:14px;color:#909399">最近 {{ failures.length }} 次同步失败记录</span>
+              <span style="font-size:14px;color:var(--muted-2)">最近 {{ failures.length }} 次同步失败记录</span>
               <a-button @click="loadFailures" :loading="failuresLoading">刷新</a-button>
             </div>
             <a-table
@@ -189,14 +189,14 @@
               </template>
             </a-table>
             <div v-else class="empty-state">
-              <CheckCircleOutlined style="font-size:48px;color:#52c41a" />
+              <CheckCircleOutlined style="font-size:48px;color:var(--ok)" />
               <p>暂无同步失败记录</p>
             </div>
           </div>
 
           <div v-if="activeTab === 'files'" class="files-tab">
             <div class="toolbar">
-              <span style="font-size:14px;color:#909399">共 {{ fileList.length }} 个文件</span>
+              <span style="font-size:14px;color:var(--muted-2)">共 {{ fileList.length }} 个文件</span>
               <a-button @click="loadFileList" :loading="fileListLoading">刷新</a-button>
             </div>
             <a-table
@@ -1118,7 +1118,7 @@ export default defineComponent({
   background-size: cover;
 }
 .upload-content {
-  background: #fff;
+  background: var(--panel);
   padding: 20px 60px;
   margin-top: 15px;
   border-radius: 5px;
@@ -1128,19 +1128,19 @@ export default defineComponent({
     line-height: 24px;
     position: relative;
     font-size: 1.4em;
-    color: #303133;
+    color: var(--text);
   }
   p {
     line-height: 26px;
     margin-bottom: 18px;
     font-size: 15px;
     font-family: "Microsoft YaHei";
-    color: #606266;
+    color: var(--muted);
     text-align: left;
   }
 }
 .upload-area {
-  border: 2px dashed #d9d9d9;
+  border: 2px dashed var(--border);
   border-radius: 12px;
   padding: 48px 24px;
   text-align: center;
@@ -1149,22 +1149,22 @@ export default defineComponent({
   margin: 20px 0;
 }
 .upload-area:hover {
-  border-color: #1677ff;
-  background: rgba(22,119,255,0.02);
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 6%, transparent);
 }
 .upload-icon {
   font-size: 48px;
-  color: #1677ff;
+  color: var(--accent);
   margin-bottom: 12px;
 }
 .upload-area p {
-  color: #666;
+  color: var(--muted);
   margin: 4px 0;
   text-align: center;
 }
 .hint {
   font-size: 12px;
-  color: #999;
+  color: var(--muted-2);
 }
 .secret-area {
   display: flex;
@@ -1174,31 +1174,33 @@ export default defineComponent({
 }
 .secret-area label {
   font-size: 14px;
-  color: #333;
+  color: var(--text);
   white-space: nowrap;
 }
 .secret-input {
   flex: 1;
   max-width: 300px;
   padding: 8px 12px;
-  border: 1px solid #d9d9d9;
+  border: 1px solid var(--border);
   border-radius: 6px;
   font-size: 14px;
+  color: var(--text);
+  background: var(--panel);
   outline: none;
   transition: border-color 0.2s;
 }
 .secret-input:focus {
-  border-color: #1677ff;
+  border-color: var(--accent);
 }
 .verify-area {
   margin: 20px 0;
   padding: 20px;
-  background: #fafafa;
+  background: var(--panel-2);
   border-radius: 8px;
 }
 .file-info {
   font-size: 14px;
-  color: #333;
+  color: var(--text);
   margin-bottom: 12px;
   word-break: break-all;
 }
@@ -1209,35 +1211,35 @@ export default defineComponent({
   display: flex;
   gap: 0;
   margin-bottom: 16px;
-  border-bottom: 1px solid #e8e8e8;
+  border-bottom: 1px solid var(--border);
 }
 .sub-tab {
   padding: 6px 16px;
   cursor: pointer;
   font-size: 14px;
-  color: #666;
+  color: var(--muted);
   border-bottom: 2px solid transparent;
   margin-bottom: -1px;
   transition: color 0.2s, border-color 0.2s;
 }
 .sub-tab:hover {
-  color: #1677ff;
+  color: var(--accent);
 }
 .sub-tab.active {
-  color: #1677ff;
-  border-bottom-color: #1677ff;
+  color: var(--accent);
+  border-bottom-color: var(--accent);
   font-weight: 600;
 }
 .menu-crawl-pages {
   margin-top: 16px;
   padding: 12px 16px;
-  background: #fafafa;
+  background: var(--panel-2);
   border-radius: 8px;
 }
 .menu-crawl-title {
   font-size: 14px;
   font-weight: 600;
-  color: #303133;
+  color: var(--text);
   margin-bottom: 8px;
 }
 .menu-crawl-page {
@@ -1245,13 +1247,13 @@ export default defineComponent({
   align-items: center;
   gap: 6px;
   font-size: 13px;
-  color: #606266;
+  color: var(--muted);
   padding: 4px 0;
 }
 .chunk-badge {
   font-size: 12px;
-  color: #1677ff;
-  background: #e6f4ff;
+  color: var(--accent);
+  background: var(--accent-weak);
   padding: 1px 6px;
   border-radius: 4px;
   margin-left: auto;
@@ -1259,23 +1261,25 @@ export default defineComponent({
 .text-input {
   width: 100%;
   padding: 12px 14px;
-  border: 1px solid #d9d9d9;
+  border: 1px solid var(--border);
   border-radius: 8px;
   font-size: 14px;
   line-height: 1.6;
   font-family: inherit;
+  color: var(--text);
+  background: var(--panel);
   resize: vertical;
   outline: none;
   transition: border-color 0.2s;
   box-sizing: border-box;
 }
 .text-input:focus {
-  border-color: #1677ff;
+  border-color: var(--accent);
 }
 .char-count {
   text-align: right;
   font-size: 12px;
-  color: #999;
+  color: var(--muted-2);
   margin: 6px 0 12px;
 }
 .secret-row {
@@ -1286,25 +1290,27 @@ export default defineComponent({
 }
 .secret-row label {
   font-size: 14px;
-  color: #333;
+  color: var(--text);
   white-space: nowrap;
 }
 .secret-row .secret-input {
   flex: 1;
   max-width: 200px;
   padding: 8px 12px;
-  border: 1px solid #d9d9d9;
+  border: 1px solid var(--border);
   border-radius: 6px;
   font-size: 14px;
+  color: var(--text);
+  background: var(--panel);
   outline: none;
   transition: border-color 0.2s;
 }
 .secret-row .secret-input:focus {
-  border-color: #1677ff;
+  border-color: var(--accent);
 }
 .submit-btn {
   padding: 8px 20px;
-  background: #1677ff;
+  background: var(--accent);
   color: #fff;
   border: none;
   border-radius: 6px;
@@ -1313,10 +1319,10 @@ export default defineComponent({
   transition: background 0.2s;
 }
 .submit-btn:hover {
-  background: #4096ff;
+  background: var(--accent-hover);
 }
 .submit-btn:disabled {
-  background: #a0c4ff;
+  background: color-mix(in srgb, var(--accent) 45%, var(--panel));
   cursor: not-allowed;
 }
 .status {
@@ -1326,30 +1332,30 @@ export default defineComponent({
   font-size: 14px;
 }
 .status.uploading {
-  background: #e6f7ff;
-  border: 1px solid #91d5ff;
-  color: #1890ff;
+  background: var(--accent-weak);
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+  color: var(--accent);
 }
 .status.success {
-  background: #f6ffed;
-  border: 1px solid #b7eb8f;
-  color: #52c41a;
+  background: var(--ok-bg);
+  border: 1px solid color-mix(in srgb, var(--ok) 40%, transparent);
+  color: var(--ok);
 }
 .status.error {
-  background: #fff2f0;
-  border: 1px solid #ffccc7;
-  color: #ff4d4f;
+  background: var(--bad-bg);
+  border: 1px solid color-mix(in srgb, var(--bad) 40%, transparent);
+  color: var(--bad);
 }
 .how-to {
   margin-top: 32px;
   padding: 24px 28px;
-  background: #fafafa;
+  background: var(--panel-2);
   border-radius: 8px;
 
   h3 {
     font-size: 16px;
     margin-bottom: 16px;
-    color: #303133;
+    color: var(--text);
     display: flex;
     align-items: center;
     gap: 6px;
@@ -1357,7 +1363,7 @@ export default defineComponent({
 
   h4 {
     font-size: 15px;
-    color: #303133;
+    color: var(--text);
     margin: 14px 0 8px;
     display: flex;
     align-items: center;
@@ -1372,7 +1378,7 @@ export default defineComponent({
 
   li {
     font-size: 14px;
-    color: #606266;
+    color: var(--muted);
     line-height: 26px;
     display: flex;
     align-items: flex-start;
@@ -1381,7 +1387,7 @@ export default defineComponent({
   }
 
   .anticon {
-    color: #1677ff;
+    color: var(--accent);
     flex-shrink: 0;
     margin-top: 4px;
   }
@@ -1393,8 +1399,8 @@ export default defineComponent({
 }
 .stat-card {
   flex: 1;
-  background: #fafafa;
-  border: 1px solid #f0f0f0;
+  background: var(--panel-2);
+  border: 1px solid var(--border);
   border-radius: 8px;
   padding: 20px;
   text-align: center;
@@ -1402,11 +1408,11 @@ export default defineComponent({
 .stat-value {
   font-size: 28px;
   font-weight: 600;
-  color: #1677ff;
+  color: var(--accent);
 }
 .stat-label {
   font-size: 14px;
-  color: #909399;
+  color: var(--muted-2);
   margin-top: 4px;
 }
 .toolbar {
@@ -1424,14 +1430,14 @@ export default defineComponent({
   gap: 8px;
   padding: 6px 12px;
   font-size: 13px;
-  color: #606266;
-  border-bottom: 1px solid #f5f5f5;
+  color: var(--muted);
+  border-bottom: 1px solid var(--border-weak);
 }
 .chunk-item:last-child {
   border-bottom: none;
 }
 .chunk-index {
-  color: #1677ff;
+  color: var(--accent);
   font-weight: 600;
   white-space: nowrap;
   min-width: 24px;
@@ -1441,13 +1447,13 @@ export default defineComponent({
 }
 .chunk-loading {
   padding: 12px;
-  color: #999;
+  color: var(--muted-2);
   text-align: center;
 }
 .empty-state {
   text-align: center;
   padding: 80px 0;
-  color: #909399;
+  color: var(--muted-2);
 }
 .empty-state p {
   margin-top: 12px;
@@ -1461,47 +1467,47 @@ export default defineComponent({
   cursor: pointer;
   text-decoration: underline;
   text-decoration-style: dotted;
-  color: #1677ff;
+  color: var(--accent);
 }
 .files-tab {
   margin: 20px 0;
 }
 .score-modal-mask { position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 1000; display: flex; align-items: center; justify-content: center; }
-.score-modal { position: relative; cursor: move; width: 420px; max-height: 80vh; overflow-y: auto; background: #fff; border-radius: 12px; padding: 24px; box-shadow: 0 8px 30px rgba(0,0,0,.2); }
+.score-modal { position: relative; cursor: move; width: 420px; max-height: 80vh; overflow-y: auto; background: var(--panel); border-radius: 12px; padding: 24px; box-shadow: var(--shadow-pop); }
 .score-modal button, .score-modal a, .score-modal input, .score-modal select, .score-modal .ant-progress, .score-modal .score-actions, .score-modal .score-dims, .score-modal .score-issues { cursor: auto; }
 .score-modal .score-bar { cursor: default; }
-.score-close { position: absolute; top: 8px; right: 12px; border: none; background: none; font-size: 20px; color: #999; cursor: pointer; line-height: 1; }
-.score-close:hover { color: #333; }
+.score-close { position: absolute; top: 8px; right: 12px; border: none; background: none; font-size: 20px; color: var(--muted-2); cursor: pointer; line-height: 1; }
+.score-close:hover { color: var(--text); }
 .score-title { margin: 0 0 16px; font-size: 18px; text-align: center; cursor: move; user-select: none; }
 .score-analyzing { text-align: center; padding: 16px 0; }
-.score-tip { margin-top: 14px; color: #666; }
+.score-tip { margin-top: 14px; color: var(--muted); }
 .score-result-head { text-align: center; margin: 8px 0 14px; }
 .score-big { font-size: 40px; font-weight: 700; }
-.score-slash { color: #999; font-size: 16px; }
+.score-slash { color: var(--muted-2); font-size: 16px; }
 .score-badge { display: inline-block; margin-left: 8px; padding: 2px 10px; border-radius: 10px; font-size: 13px; color: #fff; vertical-align: middle; }
-.score-green .score-big { color: #52c41a; } .score-green .score-badge { background: #52c41a; }
-.score-yellow .score-big { color: #faad14; } .score-yellow .score-badge { background: #faad14; }
-.score-red .score-big { color: #f5222d; } .score-red .score-badge { background: #f5222d; }
+.score-green .score-big { color: var(--ok); } .score-green .score-badge { background: var(--ok); }
+.score-yellow .score-big { color: var(--warn); } .score-yellow .score-badge { background: var(--warn); }
+.score-red .score-big { color: var(--bad); } .score-red .score-badge { background: var(--bad); }
 .score-dims { margin: 10px 0; }
-.score-dim { display: flex; align-items: center; gap: 8px; margin: 6px 0; font-size: 13px; color: #555; }
-.score-dim .score-bar { flex: 1; height: 6px; background: #eee; border-radius: 3px; overflow: hidden; }
-.score-dim .score-bar-fill { height: 100%; background: #1677ff; border-radius: 3px; transition: width .4s; }
+.score-dim { display: flex; align-items: center; gap: 8px; margin: 6px 0; font-size: 13px; color: var(--muted); }
+.score-dim .score-bar { flex: 1; height: 6px; background: var(--border-weak); border-radius: 3px; overflow: hidden; }
+.score-dim .score-bar-fill { height: 100%; background: var(--accent); border-radius: 3px; transition: width .4s; }
 .score-dim b { width: 28px; text-align: right; }
-.score-issues { background: #fff7e6; border-radius: 8px; padding: 10px 12px; color: #ad6800; font-size: 13px; margin: 8px 0; }
-.score-suggestion { background: #e6f7ff; border-radius: 8px; padding: 10px 12px; color: #0050b3; font-size: 13px; margin: 8px 0; }
-.score-fail { background: #fff1f0; border-radius: 8px; padding: 10px 12px; color: #cf1322; font-size: 13px; margin: 8px 0; }
+.score-issues { background: var(--warn-bg); border-radius: 8px; padding: 10px 12px; color: var(--warn); font-size: 13px; margin: 8px 0; }
+.score-suggestion { background: var(--accent-weak); border-radius: 8px; padding: 10px 12px; color: var(--accent); font-size: 13px; margin: 8px 0; }
+.score-fail { background: var(--bad-bg); border-radius: 8px; padding: 10px 12px; color: var(--bad); font-size: 13px; margin: 8px 0; }
 .score-actions { display: flex; align-items: center; gap: 10px; justify-content: flex-end; margin-top: 16px; }
 .score-actions button { padding: 6px 16px; height: 32px; box-sizing: border-box; border-radius: 6px; border: none; cursor: pointer; font-size: 14px; }
 .btn-spinner { display: inline-block; width: 14px; height: 14px; margin-right: 6px; border: 2px solid rgba(255,255,255,.35); border-top-color: #fff; border-radius: 50%; animation: btn-spin .7s linear infinite; vertical-align: -2px; }
 @keyframes btn-spin { to { transform: rotate(360deg); } }
 .btn-view { background: #722ed1; color: #fff; }
-.btn-fix { background: #faad14; color: #fff; margin-top: 16px; }
-.btn-submit { background: #52c41a; color: #fff; margin-top: 16px; }
-.btn-force { background: #909399; color: #fff; margin-top: 16px; }
+.btn-fix { background: var(--warn); color: #fff; margin-top: 16px; }
+.btn-submit { background: var(--ok); color: #fff; margin-top: 16px; }
+.btn-force { background: var(--muted); color: #fff; margin-top: 16px; }
 .compare-modal { width: 1500px; max-width: 95vw; max-height: 1000px; }
 .fix-compare { display: flex; gap: 10px; margin: 10px 0; }
 .fix-col { flex: 1; min-width: 0; }
-.fix-col-title { font-size: 12px; color: #888; margin-bottom: 4px; }
-.fix-text { max-height: 600px; overflow: auto; background: #fafafa; border: 1px solid #eee; border-radius: 6px; padding: 8px; font-size: 12px; white-space: pre-wrap; word-break: break-all; }
+.fix-col-title { font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+.fix-text { max-height: 600px; overflow: auto; background: var(--panel-2); border: 1px solid var(--border); border-radius: 6px; padding: 8px; font-size: 12px; white-space: pre-wrap; word-break: break-all; }
 .fix-actions { justify-content: flex-start; margin-top: 0; }
 </style>

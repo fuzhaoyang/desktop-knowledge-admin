@@ -15,6 +15,6 @@ defineProps<{ activeTab: string }>()
   height: 100%;
   overflow-y: auto;
   padding: 16px;
-  background: #f5f7fd;
+  background: var(--bg);
 }
 </style>

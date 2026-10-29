@@ -172,19 +172,19 @@ function onLogout() { logout() }
 
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: #f5f7fd; }
+html body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg); color: var(--text); }
 ::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #c8d0dc; border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: var(--tag-bg, #1677ff); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent); }
 ::-webkit-scrollbar-corner { background: transparent; }
 .app { display: flex; flex-direction: column; height: 100vh; }
 .app-body { flex: 1; display: flex; overflow: hidden; }
 .app-sidebar {
   width: 180px;
   flex-shrink: 0;
-  background: #fff;
-  border-right: 1px solid #f0f0f0;
+  background: var(--panel);
+  border-right: 1px solid var(--border);
   overflow-y: auto;
   overflow-x: hidden;
   display: flex;
@@ -197,9 +197,9 @@ body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: #
   flex-shrink: 0;
   padding: 12px 20px;
   font-size: 12px;
-  color: #c0c4cc;
+  color: var(--muted-2);
   text-align: center;
-  border-top: 1px solid #f0f0f0;
+  border-top: 1px solid var(--border);
 }
 .app-main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
 .content-toolbar {
@@ -207,8 +207,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: #
   display: flex;
   align-items: center;
   padding: 8px 12px;
-  background: #fff;
-  border-bottom: 1px solid #f0f0f0;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
 }
 .collapse-trigger {
   display: flex;
@@ -219,11 +219,11 @@ body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: #
   border: none;
   border-radius: 6px;
   background: transparent;
-  color: #606266;
+  color: var(--muted);
   cursor: pointer;
   transition: background 0.2s, color 0.2s;
 }
-.collapse-trigger:hover { background: #f5f7fd; color: #1677ff; }
+.collapse-trigger:hover { background: var(--hover); color: var(--accent); }
 .toolbar-spacer { flex: 1; }
 .logout-btn {
   display: flex;
@@ -234,14 +234,14 @@ body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: #
   border: none;
   border-radius: 6px;
   background: transparent;
-  color: #606266;
+  color: var(--muted);
   font-size: 16px;
   cursor: pointer;
   transition: background 0.2s, color 0.2s;
 }
 .logout-btn:hover {
-  background: #fef0f0;
-  color: #e8494e;
+  background: var(--bad-bg);
+  color: var(--bad);
 }
 .content-wrap { flex: 1; overflow: hidden; }
 </style>

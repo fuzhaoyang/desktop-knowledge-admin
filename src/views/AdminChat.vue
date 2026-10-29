@@ -327,13 +327,13 @@ onUnmounted(() => {
 .admin-chat {
   display: flex;
   height: 100%;
-  background: #f5f7fd;
+  background: var(--bg);
   overflow: hidden;
 }
 .sidebar {
   width: 300px;
-  background: #fff;
-  border-right: 1px solid #f0f0f0;
+  background: var(--panel);
+  border-right: 1px solid var(--border);
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
@@ -344,15 +344,15 @@ onUnmounted(() => {
   justify-content: space-between;
   align-items: center;
   padding: 14px 16px;
-  border-bottom: 1px solid #f0f0f0;
-  background: #fff;
-  color: #303133;
+  border-bottom: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--text);
 }
 .sidebar-header h3 {
   margin: 0;
   font-size: 15px;
   font-weight: 600;
-  color: #303133;
+  color: var(--text);
 }
 .refresh-btn {
   background: transparent;
@@ -360,15 +360,15 @@ onUnmounted(() => {
   border-radius: 6px;
   padding: 6px 8px;
   font-size: 14px;
-  color: #909399;
+  color: var(--muted-2);
   cursor: pointer;
   display: flex;
   align-items: center;
   transition: background 0.2s, color 0.2s;
 }
 .refresh-btn:hover {
-  background: #f5f7fd;
-  color: var(--tag-bg, #1677ff);
+  background: var(--hover);
+  color: var(--accent);
 }
 .session-list {
   flex: 1;
@@ -376,16 +376,16 @@ onUnmounted(() => {
 }
 .session-item {
   padding: 14px 16px;
-  border-bottom: 1px solid #f5f5f5;
+  border-bottom: 1px solid var(--border-weak);
   cursor: pointer;
   transition: background 0.2s;
 }
 .session-item:hover {
-  background: #f5f7fd;
+  background: var(--hover);
 }
 .session-item.active {
-  background: rgba(22,119,255,0.06);
-  border-left: 3px solid var(--tag-bg, #1677ff);
+  background: var(--accent-weak);
+  border-left: 3px solid var(--accent);
 }
 .session-info {
   display: flex;
@@ -396,7 +396,7 @@ onUnmounted(() => {
 .session-id {
   font-weight: 600;
   font-size: 13px;
-  color: #303133;
+  color: var(--text);
 }
 .session-status {
   font-size: 11px;
@@ -404,23 +404,23 @@ onUnmounted(() => {
   border-radius: 10px;
 }
 .session-status.waiting {
-  background: #fffbe6;
-  color: #d48806;
+  background: var(--warn-bg);
+  color: var(--warn);
 }
 .session-status.chatting {
-  background: #f6ffed;
-  color: #389e0d;
+  background: var(--ok-bg);
+  color: var(--ok);
 }
 .session-last {
   font-size: 12px;
-  color: #999;
+  color: var(--muted-2);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 .empty {
   text-align: center;
-  color: #999;
+  color: var(--muted-2);
   padding: 40px 0;
   font-size: 14px;
 }
@@ -435,9 +435,9 @@ onUnmounted(() => {
   justify-content: space-between;
   align-items: center;
   padding: 14px 16px;
-  background: #fff;
-  border-bottom: 1px solid #f0f0f0;
-  color: #303133;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
   font-weight: 600;
   position: relative;
 }
@@ -464,14 +464,14 @@ onUnmounted(() => {
 }
 .header-icon {
   font-size: 18px;
-  color: var(--tag-bg, #1677ff);
+  color: var(--accent);
 }
 .hamburger-btn {
   background: none;
   border: none;
   cursor: pointer;
   font-size: 20px;
-  color: #606266;
+  color: var(--muted);
   padding: 0;
   display: flex;
   align-items: center;
@@ -488,8 +488,8 @@ onUnmounted(() => {
 }
 .end-btn {
   background: transparent;
-  color: #e8494e;
-  border: 1px solid #fde2e2;
+  color: var(--bad);
+  border: 1px solid color-mix(in srgb, var(--bad) 30%, transparent);
   border-radius: 6px;
   padding: 4px 12px;
   font-size: 13px;
@@ -497,16 +497,16 @@ onUnmounted(() => {
   transition: background 0.2s, color 0.2s, border-color 0.2s;
 }
 .end-btn:hover {
-  background: #e8494e;
+  background: var(--bad);
   color: #fff;
-  border-color: #e8494e;
+  border-color: var(--bad);
 }
 .msg-list {
   flex: 1;
   overflow-y: auto;
   padding: 20px;
   scroll-behavior: smooth;
-  background: #f5f7fd;
+  background: var(--bg);
 }
 .msg {
   margin-bottom: 16px;
@@ -532,16 +532,16 @@ onUnmounted(() => {
   font-size: 18px;
 }
 .msg.user .avatar {
-  background: #f0f0f0;
-  color: #909399;
+  background: var(--panel-2);
+  color: var(--muted-2);
 }
 .msg.admin .avatar {
-  background: var(--tag-bg, #1677ff);
+  background: var(--accent);
   color: #fff;
 }
 .msg.system .avatar {
-  background: #f5f5f5;
-  color: #bbb;
+  background: var(--panel-2);
+  color: var(--muted-2);
 }
 .msg .bubble {
   max-width: 65%;
@@ -552,24 +552,24 @@ onUnmounted(() => {
   word-break: break-word;
 }
 .msg.user .bubble {
-  background: #fff;
-  color: #303133;
-  border: 1px solid #f0f0f0;
+  background: var(--panel);
+  color: var(--text);
+  border: 1px solid var(--border);
   border-bottom-left-radius: 4px;
 }
 .msg.admin .bubble {
-  background: var(--tag-bg, #1677ff);
+  background: var(--accent);
   color: #fff;
   border-bottom-right-radius: 4px;
 }
 .msg.system .bubble {
   background: transparent;
-  color: #bbb;
+  color: var(--muted-2);
   font-style: italic;
 }
 .input-area {
-  background: #fff;
-  border-top: 1px solid #f0f0f0;
+  background: var(--panel);
+  border-top: 1px solid var(--border);
 }
 .input-toolbar {
   display: flex;
@@ -581,7 +581,7 @@ onUnmounted(() => {
   border: none;
   cursor: pointer;
   font-size: 20px;
-  color: #595959;
+  color: var(--muted);
   padding: 4px;
   border-radius: 4px;
   transition: all 0.2s;
@@ -589,8 +589,8 @@ onUnmounted(() => {
   align-items: center;
 }
 .toolbar-btn:hover {
-  color: #1677ff;
-  background: rgba(0,0,0,0.04);
+  color: var(--accent);
+  background: var(--hover);
 }
 .emoji-wrapper {
   position: relative;
@@ -599,9 +599,9 @@ onUnmounted(() => {
   position: absolute;
   bottom: 100%;
   left: 0;
-  background: #fff;
+  background: var(--panel);
   border-radius: 8px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+  box-shadow: var(--shadow-pop);
   padding: 8px;
   z-index: 100;
   margin-bottom: 4px;
@@ -627,7 +627,7 @@ onUnmounted(() => {
   transition: background 0.15s;
 }
 .emoji-item:hover {
-  background: rgba(0,0,0,0.06);
+  background: var(--hover);
 }
 .input-container {
   position: relative;
@@ -642,6 +642,7 @@ onUnmounted(() => {
   resize: none;
   outline: none;
   font-family: inherit;
+  color: var(--text);
   box-sizing: border-box;
   min-height: 100px;
   background: transparent;
@@ -656,7 +657,7 @@ onUnmounted(() => {
 }
 .char-count {
   font-size: 11px;
-  color: #bbb;
+  color: var(--muted-2);
   white-space: nowrap;
 }
 .send-btn {
@@ -668,7 +669,7 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--tag-bg, #1677ff);
+  background: var(--accent);
   color: #fff;
   transition: all 0.2s;
   padding: 0;
@@ -678,7 +679,7 @@ onUnmounted(() => {
   transform: scale(1.05);
 }
 .send-btn:disabled {
-  background: #d9d9d9;
+  background: var(--border);
   cursor: not-allowed;
 }
 .send-btn svg {
